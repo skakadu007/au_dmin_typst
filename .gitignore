@@ -1,0 +1,25 @@
+# ==============================================================================
+# Git Ignore Rules for AU DMin Typst Project
+# ==============================================================================
+
+# User projects and private drafts
+/projects/
+projects/
+*.draft.*
+
+# Temporary test files and scratch scripts
+test_*.typ
+test_*.pdf
+scratch/
+
+# OS and Editor specific files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Typst output caches or temp files (optional / local)
+*.tmp

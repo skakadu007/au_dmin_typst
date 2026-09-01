@@ -1,0 +1,11 @@
+[package]
+name = "au_dmin_typst"
+version = "1.0.0"
+entrypoint = "typ/au-dmin.typ"
+authors = ["Andrews University DMin Community"]
+license = "MIT"
+description = "Official Doctor of Ministry (DMin) Dissertation & Writing Manual template for Andrews University (AU), featuring Turabian 8th/9th ed. Author-Date and Notes-Bibliography styles with Zotero integration."
+repository = "https://github.com/skakadu007/au_dmin_typst"
+keywords = ["andrews-university", "dmin", "dissertation", "turabian", "theology", "zotero"]
+categories = ["thesis", "paper"]
+compiler = "0.11.0"
