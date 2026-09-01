@@ -15,7 +15,7 @@
   program-director: "Stanley E. Patterson, Ph.D.",
   dean: "Jiří Moskala, Th.D., Ph.D.",
   date: "August 2026",
-  lang: "uk",
+  lang: "en",
 )
 
 // 1. Порожня початкова сторінка (Blank Flyleaf Page)

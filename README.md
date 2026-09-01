@@ -1,192 +1,198 @@
 # 🎓 Andrews University (AU) Doctor of Ministry (DMin) — Typst Template & CSL System
 
-Офіційний модульний шаблон для оформлення докторських дисертацій, проєктів та академічних досліджень у системі **Typst** згідно з вимогами **Doctor of Ministry Project Writing Manual (Andrews University, 4th Edition, August 2019)** та стандартом **Turabian 8th/9th ed. (Author-Date / Chicago 17th ed.)**.
+> 🌐 **Language / Мова**: **English** | [Українська](README_UKR.md)
+
+An official modular template for formatting doctoral project dissertations, proposals, and academic research in **Typst** according to the requirements of the **Doctor of Ministry Project Writing Manual (Andrews University, 4th Edition, August 2019)** and the **Turabian 8th/9th ed. (Author-Date / Chicago 17th ed.)** standard.
 
 ---
 
-## 🌟 Основні можливості
+## 🌟 Key Features
 
-- **Повна відповідність AU DMin Manual (4th ed.)**:
-  - **Геометрія сторінки**: ліве поле **1.5"** (для палітурки), верхнє/нижнє/праве **1.0"**, початкова сторінка розділу — **2.0"** від верхнього краю.
-  - **Інтервали та вирівнювання**: подвійний інтервал (24 pt baseline), абзацний відступ **0.5"**, нерівний правий край (ragged right).
-  - **Ієрархія підзаголовків 1–5 рівнів** Andrews University з автоматичним керуванням інтервалами.
-  - **Повний набір службових сторінок**: порожні форзаци, Abstract, Title Page, Copyright Page, Approval Page, Dedication, TOC, List of Tables, List of Illustrations, Vita.
-- **Багатомовна підтримка (i18n)**:
-  - Підтримка 5 мов: **українська (`uk`)**, **англійська (`en`)**, **російська (`ru`)**, **французька (`fr`)**, **іспанська (`es`)**.
-  - Автоматичний переклад усіх заголовків, таблиць, рисунків, службових сторінок та бібліографічних термінів.
-- **Централізоване керування метаданими (`state`)**:
-  - Усі дані дослідження (назва, автор, ступінь, керівник, комісія, дата, заклад) вказуються **один раз** на початку документа. Усі службові сторінки підтягують їх автоматично.
-- **Розумний Зміст та Списки**:
-  - Ідеальне вирівнювання точок (`fill-dots`) незалежно від кількості цифр у номері сторінки.
-  - Нависаючий відступ (`hanging-indent`) для багаторядкових підзаголовків.
-  - Підтримка ручного переносу рядка (`\ ` або `#linebreak()`) у заголовках розділів, таблиць та рисунків.
+- **Full Conformance to AU DMin Manual (4th ed.)**:
+  - **Page Geometry**: **1.5"** left margin (for binding), **1.0"** top, bottom, and right margins. Major section/chapter first pages start at **2.0"** from the top edge.
+  - **Spacing & Alignment**: Double-spaced text (24 pt baseline = 12 pt font + 12 pt leading), **0.5"** first-line paragraph indent, ragged right margin (not justified).
+  - **Andrews University 5-Level Subheading Hierarchy** with automated spacing collapse.
+  - **Complete Preliminary Pages**: Blank flyleaves, Abstract Title & 4-section Abstract Body, Title Page, Copyright Page, Approval Page, Dedication, Table of Contents, List of Illustrations, List of Tables, List of Abbreviations, Preface, and Vita.
+- **Multilingual Support (i18n)**:
+  - Supports 5 languages: **English (`en`)**, **Ukrainian (`uk`)**, **Russian (`ru`)**, **French (`fr`)**, and **Spanish (`es`)**.
+  - Automatically translates all section headings, table/figure captions, preliminary pages, and bibliographic terms based on the document or entry language.
+- **Centralized Metadata Management (`state`)**:
+  - All project metadata (title, author, degree, advisor, second reader, third reader, program director, seminary dean, completion date, school) is defined **once** at the beginning of the document and automatically inherited by all preliminary pages.
+- **Smart Table of Contents & Lists**:
+  - Perfectly aligned leader dots (`fill-dots`) ending at a uniform vertical column regardless of page digit width (`1`, `24`, `150`, `iv`).
+  - Hanging indents (`hanging-indent`) for multi-line subheadings.
+  - Support for manual line breaks (`\ ` or `#linebreak()`) in titles, subheads, tables, and figures with proper indentation across text and TOC.
 
 ---
 
-## 📂 Модульна структура проєкту
+## 📂 Modular Project Structure
 
 ```
 .
-├── typ/                                              # ⚙️ ПАПКА МОДУЛІВ ШАБЛОНУ
-│   ├── state.typ                                     # Глобальні стани та метадані (au-dmin-meta)
-│   ├── i18n.typ                                      # Словники для 5 мов (uk, en, ru, fr, es)
-│   ├── layout.typ                                    # Геометрія сторінок, правила заголовків, таблиць, змісту
-│   ├── preliminary.typ                               # Попередні сторінки (Title, Abstract, Approval, Vita тощо)
-│   ├── elements.typ                                  # Структурні блоки (Chapter, Subhead5, Table, Figure, Appendix)
-│   └── au-dmin.typ                                   # Головна точка входу (реекспорт усіх модулів)
-├── csl/                                              # 📑 СТИЛІ ЦИТУВАННЯ
-│   ├── andrews-university-dmin-author-date.csl       # Багатомовний стиль AU DMin Author-Date
-│   ├── turabian-author-date.csl                      # Базовий Turabian Author-Date (Chicago 17th ed.)
+├── typ/                                              # ⚙️ TEMPLATE MODULES
+│   ├── state.typ                                     # Global states & metadata (au-dmin-meta)
+│   ├── i18n.typ                                      # Localized dictionaries for 5 languages
+│   ├── layout.typ                                    # Page geometry, typography, show rules, TOC
+│   ├── preliminary.typ                               # Preliminary pages (Title, Abstract, Approval, Vita, etc.)
+│   ├── elements.typ                                  # Structural blocks (Chapter, Subhead5, Table, Figure, Appendix)
+│   └── au-dmin.typ                                   # Root entry point (re-exports all modules)
+├── csl/                                              # 📑 CITATION STYLES
+│   ├── andrews-university-dmin-author-date.csl       # Multilingual AU DMin Author-Date style
+│   ├── turabian-author-date.csl                      # Standard Turabian Author-Date (Chicago 17th ed.)
 │   ├── chicago-author-date.csl                       # Chicago 18th ed. Author-Date
-│   └── turabian-notes-bibliography.csl               # Turabian Notes-Bibliography (виноски)
-├── example/                                          # 📄 ПРИКЛАДИ
-│   ├── main.typ                                      # Повний зразок дисертації
-│   └── references.bib                                # Зразок бібліографії
-├── doc/                                              # 📚 Офіційна документація AU
-└── README.md                                         # 📖 Ця документація
+│   └── turabian-notes-bibliography.csl               # Turabian Notes-Bibliography (footnotes)
+├── example/                                          # 📄 SAMPLE PROJECT
+│   ├── main.typ                                      # Complete sample dissertation in Typst
+│   ├── references.bib                                # Sample BibTeX bibliography
+│   └── Vashchynin_сhapter_3/                         # Real dissertation chapter sample
+├── doc/                                              # 📚 Official AU Documentation
+├── README.md                                         # 📖 This documentation (English)
+├── README_UKR.md                                     # 📖 Ukrainian documentation
+├── typst.toml                                        # 📦 Typst package manifest
+└── LICENSE                                           # ⚖️ MIT License
 ```
 
 ---
 
-## 🚀 Покрокове встановлення та запуск з нуля (Installation Guide)
+## 🚀 Step-by-Step Installation Guide
 
-Ця інструкція допоможе розгорнути середовище та розпочати роботу над дисертацією на будь-якому новому комп'ютері (**Windows, macOS або Linux**).
+This guide will help you set up the environment and start writing your dissertation on any new computer (**Windows, macOS, or Linux**).
 
 ---
 
-### Крок 1. Встановлення Typst
+### Step 1. Install Typst
 
-**Typst** — це сучасний, надшвидкий компілятор документів нового покоління (написаний на Rust).
+**Typst** is a modern, fast document compiler written in Rust.
 
 #### 🪟 Windows:
-Відкрийте **PowerShell** або **Командний рядок** та виконайте (один із варіантів):
+Open **PowerShell** or **Command Prompt** and run one of the following:
 ```powershell
-# Варіант 1 (через Windows Package Manager — рекомендовано):
+# Option 1 (via Windows Package Manager — Recommended):
 winget install --id Typst.Typst
 
-# Варіант 2 (через Chocolatey):
+# Option 2 (via Chocolatey):
 choco install typst
 
-# Варіант 3 (через Scoop):
+# Option 3 (via Scoop):
 scoop install typst
 ```
-*(Або завантажте готовий `.zip` архів із сторінки [Typst GitHub Releases](https://github.com/typst/typst/releases) та додайте `typst.exe` до змінної PATH).*
+*(Or download the `.zip` binary from [Typst GitHub Releases](https://github.com/typst/typst/releases) and add `typst.exe` to your PATH).*
 
 #### 🍏 macOS:
-Відкрийте **Термінал** та виконайте (через [Homebrew](https://brew.sh)):
+Open **Terminal** and install via [Homebrew](https://brew.sh):
 ```bash
 brew install typst
 ```
 
 #### 🐧 Linux (Ubuntu / Debian / Arch):
 ```bash
-# Ubuntu / Debian (через Snap):
+# Ubuntu / Debian (via Snap):
 sudo snap install typst --classic
 
 # Arch Linux:
 sudo pacman -S typst
 
-# Або універсальний спосіб через Cargo (Rust):
+# Or universal Rust Cargo installation:
 cargo install --locked typst-cli
 ```
 
-*Перевірте коректність встановлення:*
+*Verify installation:*
 ```bash
 typst --version
-# Має вивести: typst 0.11.x (або новішу версію)
+# Should output: typst 0.11.x (or newer)
 ```
 
 ---
 
-### Крок 2. Клонування репозиторію з GitHub
+### Step 2. Clone the Repository from GitHub
 
-Відкрийте термінал у папці, де ви хочете розмістити свій проєкт (наприклад, `Documents` або `Dev`), та виконайте:
+Open your terminal in your desired project directory (e.g., `Documents` or `Dev`):
 
 ```bash
-# 1. Клонувати репозиторій
+# 1. Clone repository
 git clone https://github.com/skakadu007/au_dmin_typst.git
 
-# 2. Перейти у папку проєкту
+# 2. Enter project folder
 cd au_dmin_typst
 ```
 
 ---
 
-### Крок 3. Налаштування редактора (VS Code — Рекомендовано)
+### Step 3. Configure Your Editor (VS Code — Recommended)
 
-Для максимального комфорту, автодоповнення коду та миттєвого попереднього перегляду PDF у реальному часі:
+For syntax highlighting, code completion, and instant side-by-side live PDF preview:
 
-1. Завантажте та встановіть [Visual Studio Code](https://code.visualstudio.com/).
-2. Відкрийте VS Code та встановіть розширення **[Tinymist Typst](https://marketplace.visualstudio.com/items?itemName=myriad-dreamit.tinymist)** (вкладка Extensions / `Ctrl+Shift+X` $\rightarrow$ пошук `Tinymist`).
-3. Відкрийте папку проєкту у VS Code:
+1. Download and install [Visual Studio Code](https://code.visualstudio.com/).
+2. Open VS Code and install the **[Tinymist Typst](https://marketplace.visualstudio.com/items?itemName=myriad-dreamit.tinymist)** extension (`Ctrl+Shift+X` $\rightarrow$ search `Tinymist`).
+3. Open the project folder in VS Code:
    ```bash
    code .
    ```
-4. Відкрийте файл `example/main.typ` і натисніть кнопку **«Show Preview»** (іконка попереднього перегляду у верхньому правому кутку редактора) або комбінацію `Ctrl+K V`.
-   - *Праворуч від коду відкриється live-вікно з PDF, яке автоматично оновлюється під час друку тексту!*
+4. Open `example/main.typ` and click the **«Show Preview»** button in the top-right corner of the editor (or press `Ctrl+K V`).
+   - *A live PDF preview will appear side-by-side, updating in real time as you type!*
 
 ---
 
-### Крок 4. Перевірка шрифтів
+### Step 4. Font Verification
 
-Стандарт Andrews University вимагає використання шрифту **Times New Roman** (12 pt).
-- **Windows та macOS**: шрифт встановлено за замовчуванням у системі.
-- **Linux**: якщо з'являється попередження `warning: unknown font family: times new roman`, встановіть базові шрифти Microsoft:
+The Andrews University manual requires **Times New Roman** (12 pt).
+- **Windows & macOS**: Installed by default.
+- **Linux**: If you see `warning: unknown font family: times new roman`, install Microsoft Core Fonts:
   ```bash
   sudo apt install ttf-mscorefonts-installer fonts-liberation
   ```
 
 ---
 
-### Крок 5. Створення вашої дисертації на основі шаблону
+### Step 5. Setting Up Your Dissertation
 
-1. Головний вхідний файл дисертації — `example/main.typ`. Ви можете редагувати його або створити копію.
-2. Вкажіть метадані вашого дослідження на початку документа:
+1. The main entry point for your dissertation is `example/main.typ`. You can edit it directly or create a copy.
+2. Configure your dissertation metadata at the top of the file:
    ```typst
    #import "typ/au-dmin.typ": *
 
    #show: au-dmin.with(
-     title: "НАЗВА ВАШОЇ ДИСЕРТАЦІЇ ВЕЛИКИМИ ЛІТЕРАМИ",
-     author: "Ім'я Прізвище Здобувача",
+     title: "YOUR DISSERTATION TITLE IN ALL CAPS",
+     author: "Your Full Name",
      degree: "Doctor of Ministry",
-     advisor: "Ім'я Наукового Керівника, Ph.D.",
-     second-reader: "Ім'я Другого Рецензента, D.Min.",
+     advisor: "Advisor Name, Ph.D.",
+     second-reader: "Second Reader Name, D.Min.",
+     third-reader: none, // or "Reader Name, Ph.D."
      program-director: "Stanley E. Patterson, Ph.D.",
      dean: "Jiří Moskala, Th.D., Ph.D.",
      date: "August 2026",
-     lang: "uk", // "uk" (українська) або "en" (англійська)
+     lang: "en", // "en" (English) or "uk" (Ukrainian), "ru", "fr", "es"
    )
    ```
-3. Додайте ваші джерела у файл `example/references.bib` (або експортуйте їх із Zotero).
+3. Add your references to `example/references.bib` (or export from Zotero).
 
 ---
 
-### Крок 6. Компіляція документа у PDF через термінал
+### Step 6. Compiling to PDF via Terminal
 
-З кореневої папки проєкту (`au_dmin_typst`) виконайте:
+From the root project directory (`au_dmin_typst`):
 
 ```bash
-# 1. Одноразова компіляція у PDF:
+# 1. Single compile:
 typst compile --root . example/main.typ example/main.pdf
 
-# 2. Режим «живого перегляду» (Live Watch):
-# Компілятор залишається активним і автоматично оновлює PDF при кожному збереженні файлу (Ctrl+S)
+# 2. Live Watch mode (recompiles automatically on save):
 typst watch --root . example/main.typ example/main.pdf
 ```
 
-> **⚠️ ВАЖЛИВО**: Завжди вказуйте прапорець `--root .` (або повний шлях до кореня), щоб Typst мав доступ до модулів шаблону в папці `typ/` та стилів цитування `csl/`.
+> **⚠️ IMPORTANT**: Always include the `--root .` flag so Typst can locate the `typ/` modules and `csl/` styles.
 
 ---
 
-## 📖 Довідник елементів та функцій
+## 📖 Component & Function Reference
 
-Нижче наведено повний перелік усіх доступних елементів із параметрами та прикладами.
+Below is the complete reference of all available components with their parameters and defaults.
 
 ---
 
-### 1. Порожня сторінка (Форзац / Flyleaf) — `#blank-page()`
+### 1. Blank Flyleaf Page — `#blank-page()`
 
-Використовується як **найперша** та **найостання** сторінка у готовій дисертації (вимога для переплетення). Не має колонтитулів, нумерації та не рахується у пагінацію.
+Used as the **first** and **last** page of the bound dissertation (binding requirement). It is unnumbered, uncounted, and has no headers or footers.
 
 ```typst
 #blank-page()
@@ -194,39 +200,39 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
-### 2. Анотація (Abstract) — Exhibits A & B
+### 2. Abstract — Exhibits A & B
 
-Анотація складається з двох частин (не нумерується і не рахується):
+The Abstract consists of two parts (unnumbered and uncounted):
 
-#### а) Титульний лист анотації — `#abstract-title-page()`
-Автоматично бере назву, автора та керівника з `au-dmin`:
+#### a) Abstract Title Page — `#abstract-title-page(...)`
+Automatically retrieves the title, author, and advisor from `au-dmin`:
 ```typst
 #abstract-title-page()
 
-// За потреби можна перевизначити вручну:
+// Optional manual overrides:
 #abstract-title-page(
-  title: "КАСТОМНА НАЗВА",
-  author: "Автор",
-  adviser: "Керівник",
-  title-lines: 2, // якщо >= 3 рядки, інтервал автоматично стискається
+  title: "CUSTOM TITLE",
+  author: "Author Name",
+  adviser: "Advisor Name",
+  title-lines: 2, // If >= 3 lines, leading is compressed automatically
 )
 ```
 
-#### б) Текст анотації з 4 розділами — `#abstract-body(...)`
+#### b) Abstract Body with 4 Sections — `#abstract-body(...)`
 ```typst
 #abstract-body(
-  problem: [Текст проблеми дослідження...],
-  method: [Текст методології...],
-  results: [Текст результатів...],
-  conclusions: [Текст висновків...],
+  problem: [Statement of the problem...],
+  method: [Research methodology...],
+  results: [Empirical findings...],
+  conclusions: [Conclusions and ministry implications...],
 )
 ```
 
 ---
 
-### 3. Титульна сторінка — `#title-page()` (Exhibit C)
+### 3. Title Page — `#title-page()` (Exhibit C)
 
-Розміщує блок університету на 2.5", назву на 4.5", ступінь на 6.0" та автора з датою на 8.5" від верхнього краю.
+Positions the university block at 2.5", title at 4.5", degree presentation at 6.0", and author/date at 8.5" from the top edge.
 
 ```typst
 #title-page()
@@ -234,26 +240,26 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
-### 4. Сторінка авторського права — `#copyright-page()`
+### 4. Copyright Page — `#copyright-page(...)`
 
-Розміщується одразу **після титульної сторінки** та **перед листом схвалення**. Не нумерується і не рахується.
+Placed immediately **after the Title Page** and **before the Approval Page**. Unnumbered and uncounted.
 
 ```typst
 #copyright-page()
 
-// За потреби можна вказати кастомний рік або текст:
+// Optional customization:
 #copyright-page(
-  author: "Taras Shevchenko",
+  author: "Author Name",
   year: "2026",
-  content: auto, // за замовчуванням: Copyright © 2026 by Taras Shevchenko \ Всі права захищено
+  content: auto, // Default: © Copyright by Author Name 2026 \ All Rights Reserved
 )
 ```
 
 ---
 
-### 5. Лист схвалення комісією — `#approval-page()` (Exhibit D)
+### 5. Approval Page — `#approval-page()` (Exhibit D)
 
-Автоматично генерує блок підписів для наукового керівника, другого рецензента, третього рецензента (якщо є), директора програми DMin, декана семінарії та дати схвалення.
+Automatically generates signature lines for the Advisor, Second Reader, Third Reader (if present), Program Director, Seminary Dean, and Approval Date.
 
 ```typst
 #approval-page()
@@ -261,49 +267,49 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
-### 6. Сторінка присвяти — `#dedication-page(...)`
+### 6. Dedication Page — `#dedication-page(...)`
 
-Необов'язкова сторінка з курсивним текстом по центру (стор. iii):
+Optional preliminary page with centered italicized text (p. iii):
 
 ```typst
 #dedication-page[
-  Присвячується моїй родині...
+  Dedicated to my family...
 ]
 ```
 
 ---
 
-### 7. Зміст — `#dmin-toc(...)` (Exhibit E)
+### 7. Table of Contents — `#dmin-toc(...)` (Exhibit E)
 
-Генерує зміст із точками лідерів, нависаючими відступами для підзаголовків та опцією приховування номера сторінки:
+Generates the Table of Contents with leader dots, hanging indents for subheadings, and optional page number suppression:
 
 ```typst
 #dmin-toc()
 
-// Якщо потрібно приховати номер сторінки на самому аркуші змісту:
+// Hide page number on the TOC page itself:
 #dmin-toc(show-page-number: false)
 
-// З кастомним заголовком:
-#dmin-toc(title: "ЗМІСТ РОБОТИ")
+// Custom TOC title:
+#dmin-toc(title: "TABLE OF CONTENTS")
 ```
 
 ---
 
-### 8. Списки ілюстрацій та таблиць — `#list-of-illustrations()` та `#list-of-tables()` (Exhibit F)
+### 8. List of Illustrations & List of Tables — `#list-of-illustrations()` & `#list-of-tables()` (Exhibit F)
 
-За правилами AU DMin, спочатку йде **Список ілюстрацій**, а потім **Список таблиць**. Якщо обидва списки короткі, вони розміщуються **на одній сторінці**:
+Per the AU DMin Manual, the **List of Illustrations** comes first, followed by the **List of Tables**. If short, both share a single page:
 
 ```typst
 #list-of-illustrations()
-#list-of-tables(pagebreak: false) // розміщує таблиці на тій самій сторінці
+#list-of-tables(pagebreak: false) // Keeps tables on the same page as illustrations
 
-// Якщо таблиць багато і потрібна окрема сторінка:
+// If there are many tables requiring a separate page:
 #list-of-tables(pagebreak: true)
 ```
 
 ---
 
-### 9. Список скорочень — `#list-of-abbreviations(...)` (Exhibit G)
+### 9. List of Abbreviations — `#list-of-abbreviations(...)` (Exhibit G)
 
 ```typst
 #list-of-abbreviations(items: (
@@ -315,126 +321,126 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
-### 10. Передмова / Подяки — `#preface-page(...)` (Exhibit H)
+### 10. Preface / Acknowledgments — `#preface-page(...)` (Exhibit H)
 
 ```typst
 #preface-page(title: auto)[
-  Текст подяк або передмови...
+  Text of acknowledgments or preface...
 ]
 ```
 
 ---
 
-### 11. Розділи дисертації — `#dmin-chapter(...)` (Exhibit I)
+### 11. Dissertation Chapters — `#dmin-chapter(...)` (Exhibit I)
 
-Починає нову сторінку з відступом 2.0" від верхнього краю та генерує заголовок `РОЗДІЛ N` (або `CHAPTER N`):
+Starts a new page at 2.0" from the top edge and generates the `CHAPTER N` heading:
 
 ```typst
 #dmin-chapter(
-  title: "Використання науки в богослов'ї: \ Вступ та історичний контекст",
+  title: "The Use of Science in Theology: \ Introduction and Historical Background",
 )
 ```
 
-> **Підказка**: Щоб вручну перенести довгу назву розділу на новий рядок, використовуйте `\ `.
+> **Tip**: Use `\ ` to manually break long chapter titles into an inverted pyramid shape.
 
 ---
 
-### 12. Ієрархія підзаголовків (AU Subheadings Levels 1–5)
+### 12. Subheading Hierarchy (AU Levels 1–5)
 
-| Рівень AU | Команда у Typst | Форматування | Приклад |
+| AU Level | Typst Syntax | Formatting | Example |
 |---|---|---|---|
-| **Level 1** | `#heading(level: 2)[...]` | По центру, **Жирний**, Title Case | `#heading(level: 2)[Вступ]` |
-| **Level 2** | `#heading(level: 3)[...]` | По центру, Звичайний, Title Case | `#heading(level: 3)[Межі науки \ та віри]` |
-| **Level 3** | `#heading(level: 4)[...]` | По лівому краю, **Жирний**, Title Case | `#heading(level: 4)[Природа богослов'я]` |
-| **Level 4** | `#heading(level: 5)[...]` | По лівому краю, Звичайний, Sentence case | `#heading(level: 5)[Інновації в освіті]` |
-| **Level 5** | `#subhead5[Заголовок][Текст...]` | В підбір (врізний), **Жирний.**, 0.5" відступ | `#subhead5[Студенти][Текст абзацу...]` |
+| **Level 1** | `#heading(level: 2)[...]` | Centered, **Bold**, Title Case | `#heading(level: 2)[Introduction]` |
+| **Level 2** | `#heading(level: 3)[...]` | Centered, Regular (not bold), Title Case | `#heading(level: 3)[The Limits of Science]` |
+| **Level 3** | `#heading(level: 4)[...]` | Left margin, **Bold**, Title Case | `#heading(level: 4)[Nature of Theology]` |
+| **Level 4** | `#heading(level: 5)[...]` | Left margin, Regular (not bold), Sentence case | `#heading(level: 5)[Curricular innovations]` |
+| **Level 5** | `#subhead5[Heading][Text...]` | Run-in paragraph, **Bold.**, 0.5" indent | `#subhead5[Students][Paragraph text...]` |
 
 ---
 
-### 13. Блокова цитата — `#blockquote[...]`
+### 13. Block Quotations — `#blockquote[...]`
 
-Для цитат від 5 рядків (одинарний інтервал, відступ 0.25", подвійний інтервал до і після):
+For quotations of 5 lines or more (single-spaced, 0.25" left indent, double-spaced before and after):
 
 ```typst
 #blockquote[
-  Текст розлогої цитати... @gilkey1989[p. 11]
+  Extended quotation text... @gilkey1989[p. 11]
 ]
 ```
 
 ---
 
-### 14. Таблиці — `#dmin-table(...)`
+### 14. Tables — `#dmin-table(...)`
 
 ```typst
 #dmin-table(
-  number: 1, // або auto
-  title: "Фактори впливу на вибір студентів \ програми DMin (N = 24)",
+  number: 1, // or auto
+  title: "Factors Influencing Student Program Selection (N = 24)",
   table(
     columns: (3.2in, 1.5in),
     stroke: (x, y) => if y == 0 { (bottom: 1pt + black, top: 1pt + black) } 
                       else if y == 4 { (bottom: 1pt + black) } else { none },
     align: (left, right),
-    [#text(weight: "bold")[Критерій]], [#text(weight: "bold")[Відсоток (%)]],
-    [Гнучкий графік], [30.2],
-    [Якість наставництва], [22.1],
+    [#text(weight: "bold")[Criterion]], [#text(weight: "bold")[Percentage (%)]],
+    [Flexible schedule], [30.2],
+    [Mentorship quality], [22.1],
   ),
-  note: [Примітка. Дані опитування когорти DMin, літо 2026.],
+  note: [Note. Data from DMin cohort survey, Summer 2026.],
 )
 ```
 
 ---
 
-### 15. Рисунки та ілюстрації — `#dmin-figure(...)`
+### 15. Figures & Illustrations — `#dmin-figure(...)`
 
 ```typst
 #dmin-figure(
-  number: 1, // або auto
-  caption: "Концептуальна модель інтеграційного \ пасторського формування",
+  number: 1, // or auto
+  caption: "Conceptual Model of Integrative \ Pastoral Formation",
   rect(width: 4.5in, height: 1.5in, stroke: 1pt + luma(100), radius: 4pt)[
-    #align(center + horizon)[Діаграма або графік]
+    #align(center + horizon)[Diagram or Chart Image]
   ],
-  source: [Джерело: Адаптовано з керівництва з лідерства.],
+  source: [Source: Adapted from Leadership Guide.],
 )
 ```
 
 ---
 
-### 16. Додатки — `#appendix-section(...)` (Exhibit E & Ch. 2 p. 11)
+### 16. Appendices — `#appendix-section(...)` (Exhibit E & Ch. 2 p. 11)
 
-Підтримуються два варіанти оформлення згідно з правилами Andrews University:
+Supports both formats defined by Andrews University:
 
-#### Варіант А: З окремим титульним аркушем-роздільником (`cover-sheet: true`)
-Створює титульний аркуш із заголовком по центру сторінки (`ДОДАТОК A \ НАЗВА`), а сам контент додатку починається на наступній сторінці без дублювання заголовка:
+#### Option A: With Divider Cover Sheet (`cover-sheet: true`)
+Creates a centered divider sheet (`APPENDIX A \ TITLE`), with appendix content starting on the following page without duplicating the header:
 ```typst
-#appendix-section(title: "ОПИТУВАЛЬНИК ДОСЛІДЖЕННЯ", cover-sheet: true)[
-  #heading(level: 2)[Інструмент опитування]
-  Текст анкети...
+#appendix-section(title: "RESEARCH QUESTIONNAIRE", cover-sheet: true)[
+  #heading(level: 2)[Survey Instrument]
+  Questionnaire contents...
 ]
 ```
 
-#### Варіант Б: Без титульного аркуша (`cover-sheet: false` — за замовчуванням)
-Додаток починається безпосередньо зверху нової сторінки (відступ 2.0" від верхнього краю):
+#### Option B: Without Cover Sheet (`cover-sheet: false` — default)
+The appendix starts directly at the top of a new page (2.0" top margin):
 ```typst
-#appendix-section(title: "ОФІЦІЙНІ ДОЗВОЛИ")[
-  Текст документа або скановані форми...
+#appendix-section(title: "LETTERS OF PERMISSION")[
+  Official documentation text...
 ]
 ```
 
 ---
 
-### 17. Список використаних джерел — `#dmin-bibliography(...)`
+### 17. Reference List / Bibliography — `#dmin-bibliography(...)`
 
 ```typst
 #dmin-bibliography(
   "../example/references.bib", 
-  title: auto, // за замовчуванням: "СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ" або "REFERENCE LIST"
+  title: auto, // Defaults to "REFERENCE LIST" (EN) or "СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ" (UK)
   style: "../csl/andrews-university-dmin-author-date.csl",
 )
 ```
 
 ---
 
-### 18. Відомості про автора (Vita) — `#vita-page(...)`
+### 18. Vita Page — `#vita-page(...)`
 
 ```typst
 #vita-page()[
@@ -455,81 +461,67 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
-## 📚 Як робити посилання на джерела (Цитування та бібліографія)
+## 📚 How to Cite Sources (Citations & Bibliography)
 
-Шаблон використовує систему **Author-Date** стандарту **Turabian 8th/9th ed. / Chicago 17th ed.** у повній відповідності до вимог **AU DMin Writing Manual (Chapter 4 & 5)** через фірмовий CSL-стиль `csl/andrews-university-dmin-author-date.csl`.
+The template utilizes the **Author-Date** style of **Turabian 8th/9th ed. / Chicago 17th ed.** in full compliance with **AU DMin Writing Manual (Chapters 4 & 5)** via the custom CSL style `csl/andrews-university-dmin-author-date.csl`.
 
 ---
 
-### 1. Формати цитування у тексті Typst
+### 1. In-Text Citation Formats in Typst
 
-У Typst можна цитувати як стандартним способом через `@key`, так і за допомогою функції `#cite(...)` з параметром `form`:
+You can cite sources using standard `@key` syntax or using the `#cite(...)` function with the `form` parameter:
 
-| Тип цитування | Синтаксис у Typst | Результат у тексті | Опис / Застосування |
+| Citation Type | Typst Syntax | Result in Text | Description / Use Case |
 |---|---|---|---|
-| **Звичайне посилання** | `@smith2018` | `(Smith 2018)` | Стандартне посилання в дужках |
-| **Зі сторінкою** | `@smith2018[p. 45]` або `@smith2018[с. 45]` | `(Smith 2018, 45)` | Посилання на конкретну сторінку |
-| **З діапазоном сторінок** | `@smith2018[pp. 45-48]` | `(Smith 2018, 45–48)` | Посилання на діапазон сторінок |
-| **З томом і сторінкою** | `@calvin1960[20:45]` | `(Calvin 1960, 20:45)` | Багатотомні видання |
-| **Тільки рік** (автор у тексті) | `#cite(<smith2018>, form: "year")` | `2018` | Коли автора названо в реченні |
-| **Тільки автор** | `#cite(<smith2018>, form: "author")` | `Smith` | Виводить тільки прізвище автора |
-| **Розповідне (Prose)** | `#cite(<smith2018>, form: "prose")` | `Smith (2018)` | Автор поза дужками, рік у дужках |
-| **Розповідне зі сторінкою** | `#cite(<smith2018>, form: "prose", supplement: [45])` | `Smith (2018, 45)` | Зручно для початку речення |
-| **Декілька джерел разом** | `#cite(<smith2018>, <craigie1983>)` | `(Smith 2018; Craigie 1983)` | Кілька посилань через крапку з комою |
-| **З префіксом** (*див.*, *пор.*) | `#cite(<smith2018>, prefix: [див. ], supplement: [с. 12])` | `(див. Smith 2018, 12)` | Посилання з ввідними словами |
-| **У блоковій цитаті** | `#blockquote[Текст... @gilkey1989[p. 11]]` | `... (Gilkey 1989, 11)` | Оформлення довгих цитат |
+| **Parenthetical** | `@smith2018` | `(Smith 2018)` | Standard parenthetical reference |
+| **With Page Number** | `@smith2018[p. 45]` | `(Smith 2018, 45)` | Specific page reference |
+| **With Page Range** | `@smith2018[pp. 45-48]` | `(Smith 2018, 45–48)` | Multi-page range |
+| **With Volume & Page** | `@calvin1960[20:45]` | `(Calvin 1960, 20:45)` | Multi-volume works |
+| **Year Only** (author in text) | `#cite(<smith2018>, form: "year")` | `2018` | When author is named in the sentence |
+| **Author Only** | `#cite(<smith2018>, form: "author")` | `Smith` | Prints author's surname only |
+| **Narrative / Prose** | `#cite(<smith2018>, form: "prose")` | `Smith (2018)` | Author in text, year in parentheses |
+| **Narrative with Page** | `#cite(<smith2018>, form: "prose", supplement: [45])` | `Smith (2018, 45)` | Ideal for sentence leads |
+| **Multiple Sources** | `#cite(<smith2018>, <craigie1983>)` | `(Smith 2018; Craigie 1983)` | Semicolon-separated references |
+| **With Prefix** (*see*, *cf.*) | `#cite(<smith2018>, prefix: [see ], supplement: [p. 12])` | `(see Smith 2018, 12)` | Introductory words |
+| **In Blockquote** | `#blockquote[Text... @gilkey1989[p. 11]]` | `... (Gilkey 1989, 11)` | Blockquote attribution |
 
-> **💡 Приклад використання `form: "year"` та `form: "prose"` у тексті**:
+> **💡 Example using `form: "year"` and `form: "prose"` in text**:
 > ```typst
-> // Варіант 1: Автор у тексті, рік у дужках
-> Як переконливо доводить Крейгі (#cite(<craigie1983>, form: "year", supplement: [с. 15])), угаритські тексти...
-> // Результат: Як переконливо доводить Крейгі (1983, 15), угаритські тексти...
+> // Option 1: Author named in sentence, year in parentheses
+> As Craigie (#cite(<craigie1983>, form: "year", supplement: [p. 15])) argues, Ugaritic texts...
+> // Result: As Craigie (1983, 15) argues, Ugaritic texts...
 > 
-> // Варіант 2: Розповідна форма (prose)
-> Дослідження #cite(<gordiienko_2019>, form: "prose", supplement: [с. 40]) демонструє урбаністичні тенденції...
-> // Результат: Дослідження Гордієнко (2019, 40) демонструє урбаністичні тенденції...
+> // Option 2: Prose form
+> The study by #cite(<gordiienko_2019>, form: "prose", supplement: [p. 40]) demonstrates urban trends...
+> // Result: The study by Gordiienko (2019, 40) demonstrates urban trends...
 > ```
 
 ---
 
-### 2. Особливі правила цитування за стандартом AU DMin
+### 2. AU DMin Special Citation Rules
 
-1. **Книги за редакцією (Edited Books)**:
-   - У тексті вказується **тільки прізвище редактора без позначки `ed.` або `ред.`**: `(Гордієнко 2019)`.
-   - У списку літератури автоматично додається повний опис: `Гордієнко, Н. М., ред. 2019.` (для EN: `Gordiienko, N. M., ed. 2019.`).
-2. **Кількість авторів**:
-   - **1–3 автори**: перелічуються всі прізвища (`(Smith, Jones, and Brown 2020)` / `(Сміт, Джонс і Браун 2020)`).
-   - **4 і більше авторів**: виводиться перший автор + `et al.` / `та ін.` (`(Glaser et al. 1968)` / `(Глазер та ін. 1968)`).
-3. **Повторення того самого автора підряд у Списку джерел**:
-   - Якщо в списку літератури йде кілька праць одного автора, починаючи з другої праці ім'я замінюється на **3-em dash** (`———.`):
+1. **Edited Books**:
+   - In text, cite **surname only without `ed.` or `ред.`**: `(Gordiienko 2019)`.
+   - In the bibliography, the full description is automatically appended: `Gordiienko, N. M., ed. 2019.`.
+2. **Author Count**:
+   - **1–3 authors**: all names are listed (`(Smith, Jones, and Brown 2020)`).
+   - **4 or more authors**: shortened to `et al.` (`(Glaser et al. 1968)`).
+3. **Repeated Authors in Bibliography (3-em dash)**:
+   - Successive works by the exact same author automatically replace the name with a **3-em dash** (`———.`):
      ```
      Andrews University. 2019. Doctor of Ministry Project Writing Manual.
      ———. 2024. Seminary Guidelines.
      ```
-4. **Електронні ресурси (URL)**:
-   - Дата доступу передує посиланню: `Дата звернення 25 серпень 2026. https://...` (для EN: `Accessed August 25, 2026. https://...`).
+4. **Electronic Resources (URL)**:
+   - Access date precedes the URL: `Accessed August 25, 2026. https://...`.
 
 ---
 
-### 3. Підключення списку використаних джерел
+### 3. Bibliography Entry Samples (`.bib`)
 
-У кінці документа (після додатків або основного тексту) викликається функція `#dmin-bibliography(...)`:
+Include the `language = {english}` or `language = {ukrainian}` field for proper localized terms.
 
-```typst
-#dmin-bibliography(
-  "../example/references.bib", 
-  title: auto, // Автоматично: "СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ" (UK) або "REFERENCE LIST" (EN)
-  style: "../csl/andrews-university-dmin-author-date.csl",
-)
-```
-
----
-
-### 4. Зразки оформлення джерел у файлі `.bib`
-
-Для кожного запису рекомендується додавати поле `language = {ukrainian}` або `language = {english}`.
-
-#### а) Книга з одним або кількома авторами (`@book`)
+#### a) Book with Author (`@book`)
 ```bibtex
 @book{craigie1983,
   author    = {Peter C. Craigie},
@@ -541,7 +533,7 @@ typst watch --root . example/main.typ example/main.pdf
 }
 ```
 
-#### б) Книга за редакцією (`editor`)
+#### b) Edited Book (`editor`)
 ```bibtex
 @book{gordiienko_2019,
   editor    = {Гордієнко, Н. М.},
@@ -553,21 +545,21 @@ typst watch --root . example/main.typ example/main.pdf
 }
 ```
 
-#### в) Стаття у науковому журналі (`@article`)
+#### c) Journal Article (`@article`)
 ```bibtex
 @article{vashchynin_2024,
-  author    = {Ващинін, Сергій},
-  title     = {Науково-богословський діалог у пасторській практиці},
-  journal   = {Український богословський вісник},
+  author    = {Serhii Vashchynin},
+  title     = {Theological and Scientific Dialogue in Pastoral Practice},
+  journal   = {Ukrainian Theological Journal},
   volume    = {12},
   number    = {2},
   pages     = {45--62},
   year      = {2024},
-  language  = {ukrainian}
+  language  = {english}
 }
 ```
 
-#### г) Розділ у збірнику статей або колективній монографії (`@incollection`)
+#### d) Book Chapter / Essay in Edited Volume (`@incollection`)
 ```bibtex
 @incollection{gilkey1989,
   author    = {Langdon Gilkey},
@@ -582,20 +574,20 @@ typst watch --root . example/main.typ example/main.pdf
 }
 ```
 
-#### ґ) Дисертація чи магістерський проєкт (`@phdthesis` / `@thesis`)
+#### e) Dissertation or Thesis (`@phdthesis` / `@thesis`)
 ```bibtex
 @phdthesis{vashchynin_dmin_2026,
-  author    = {Ващинін, Сергій},
-  title     = {Інтеграційна модель пасторського служіння в умовах технологічних викликів},
+  author    = {Serhii Vashchynin},
+  title     = {An Integrative Model for Pastoral Leadership Amidst Technological Challenges},
   school    = {Seventh-day Adventist Theological Seminary, Andrews University},
   address   = {Berrien Springs, MI},
   year      = {2026},
-  type      = {Професійна дисертація D.Min.},
-  language  = {ukrainian}
+  type      = {D.Min. Project Dissertation},
+  language  = {english}
 }
 ```
 
-#### д) Веб-сайт, інтернет-публікація чи інструкція (`@misc` / `@online`)
+#### f) Website or Online Document (`@misc` / `@online`)
 ```bibtex
 @misc{andrews_manual_2024,
   author    = {{Andrews University}},
@@ -603,38 +595,38 @@ typst watch --root . example/main.typ example/main.pdf
   year      = {2024},
   url       = {https://www.andrews.edu/sem/dmin/project/},
   urldate   = {2026-08-25},
-  language  = {ukrainian}
+  language  = {english}
 }
 ```
 
 ---
 
-### 5. 📥 Експорт джерел із Zotero у Typst
+### 4. 📥 Exporting References from Zotero to Typst
 
-Система **Typst** безпосередньо зчитує бібліографічні бази даних у форматі **BibTeX (`.bib`)**. Ви можете легко експортувати бібліотеку або окрему папку із бібліографічного менеджера **Zotero**:
+**Typst** natively parses **BibTeX (`.bib`)** files. You can easily export your library from **Zotero**:
 
-#### Варіант А: Одноразовий експорт (Стандартний Zotero)
-1. У Zotero клікніть правою кнопкою миші на потрібну **Колекцію** або **My Library**.
-2. Оберіть пункт **«Export Collection...»** (Експортувати колекцію).
-3. У полі **Format** (Формат) виберіть: **`BibTeX`** або **`Better BibTeX`**.
-4. Переконайтеся, що встановлено кодування **`Unicode (UTF-8)`**.
-5. Збережіть файл під назвою `references.bib` у папку вашого проєкту (наприклад, `example/references.bib`).
+#### Option A: Single Export (Standard Zotero)
+1. In Zotero, right-click on your **Collection** or **My Library**.
+2. Select **«Export Collection...»**.
+3. In the **Format** dropdown, choose: **`BibTeX`** or **`Better BibTeX`**.
+4. Ensure **`Unicode (UTF-8)`** encoding is selected.
+5. Save the file as `references.bib` inside your project directory (e.g., `example/references.bib`).
 
-#### Варіант Б: Автоматична Live-синхронізація (Рекомендовано через Better BibTeX)
-Якщо ви регулярно додаєте джерела під час написання дисертації, плагін **Better BibTeX for Zotero** дозволяє тримати файл `.bib` завжди оновленим:
-1. Встановіть плагін [Better BibTeX for Zotero](https://retorque.re/zotero-better-bibtex/).
-2. Клікніть правою кнопкою на колекцію $\rightarrow$ **«Export Collection...»**.
-3. Оберіть формат **`Better BibLaTeX`** або **`Better BibTeX`**.
-4. Поставте прапорець **☑ «Keep updated»** (Тримати оновленим / Автоекспорт).
-5. Збережіть файл у папку проєкту.
-   - *Тепер щоразу, коли ви додаєте або змінюєте джерело в Zotero, файл `.bib` автоматично перезберігається, а Typst у режимі `typst watch` миттєво оновлює PDF-документ!*
+#### Option B: Live Auto-Sync (Recommended via Better BibTeX)
+If you add references continuously, the [Better BibTeX for Zotero](https://retorque.re/zotero-better-bibtex/) plugin automatically keeps your `.bib` file updated:
+1. Install **Better BibTeX for Zotero**.
+2. Right-click your collection $\rightarrow$ **«Export Collection...»**.
+3. Choose **`Better BibLaTeX`** or **`Better BibTeX`**.
+4. Check **☑ «Keep updated»** (Auto-export).
+5. Save the file into your project folder.
+   - *Whenever you add or edit a reference in Zotero, the `.bib` file updates automatically, and Typst in `typst watch` mode instantly updates the PDF!*
 
-#### 💡 Порада для багатомовних джерел у Zotero:
-- У Zotero в полі **Language** (Мова) для українських джерел вказуйте `uk` або `ukrainian`, а для англійських — `en` або `english`.
-- При експорті це поле автоматично запишеться у `.bib` як `language = {ukrainian}`, і стиль цитування AU DMin самостійно застосує правильні правила та локалізовані терміни (`ред.`, `с.`, `т.`, `дата звернення`).
+#### 💡 Multilingual Tip for Zotero:
+- In Zotero's **Language** field, specify `en` or `english` for English entries, and `uk` or `ukrainian` for Ukrainian entries.
+- The AU DMin CSL style will automatically apply the correct language rules and terms (`ed.`, `pp.`, `vol.`, `Accessed` vs `ред.`, `с.`, `т.`, `дата звернення`).
 
 ---
 
-## 📄 Ліцензія
+## 📄 License
 
-MIT License. Розроблено для здобувачів наукових ступенів та викладачів програми Doctor of Ministry Andrews University.
+MIT License. Developed for doctoral candidates and faculty of the Doctor of Ministry program at Andrews University.
