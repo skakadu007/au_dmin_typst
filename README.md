@@ -41,8 +41,7 @@
 │   └── turabian-notes-bibliography.csl               # Turabian Notes-Bibliography (виноски)
 ├── example/                                          # 📄 ПРИКЛАДИ
 │   ├── main.typ                                      # Повний зразок дисертації
-│   ├── references.bib                                # Зразок бібліографії
-│   └── Vashchynin_сhapter_3/                         # Зразок реального розділу дисертації
+│   └── references.bib                                # Зразок бібліографії
 ├── doc/                                              # 📚 Офіційна документація AU
 └── README.md                                         # 📖 Ця документація
 ```
