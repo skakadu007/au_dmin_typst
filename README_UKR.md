@@ -367,8 +367,9 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
-### 14. Таблиці — `#dmin-table(...)`
+### 14. Таблиці — `#dmin-table(...)` та `#dmin-table-isolated(...)`
 
+#### Звичайна таблиця у тексті:
 ```typst
 #dmin-table(
   number: 1, // або auto
@@ -386,10 +387,25 @@ typst watch --root . example/main.typ example/main.pdf
 )
 ```
 
+#### Ізольована таблиця на окремій сторінці (AU DMin Manual, Rule 3):
+Якщо таблиця займає півсторінки і більше, або вимагає розміщення на окремому аркуші без основного тексту до і після неї, використовуйте `#dmin-table-isolated(...)`. Функція автоматично додає `#pagebreak(weak: true)` перед таблицею та `#pagebreak()` після неї:
+
+```typst
+#dmin-table-isolated(
+  title: "Матриця відповідальності (RACI)",
+  table(
+    columns: (2.6fr, 1fr, 1.2fr, 1.2fr, 1.2fr),
+    ...
+  ),
+  note: [Примітка...],
+)
+```
+
 ---
 
-### 15. Рисунки та ілюстрації — `#dmin-figure(...)`
+### 15. Рисунки та ілюстрації — `#dmin-figure(...)` та `#dmin-figure-isolated(...)`
 
+#### Звичайний рисунок у тексті:
 ```typst
 #dmin-figure(
   number: 1, // або auto
@@ -398,6 +414,15 @@ typst watch --root . example/main.typ example/main.pdf
     #align(center + horizon)[Діаграма або графік]
   ],
   source: [Джерело: Адаптовано з керівництва з лідерства.],
+)
+```
+
+#### Ізольований рисунок на окремій сторінці:
+```typst
+#dmin-figure-isolated(
+  caption: "Схема організаційної структури",
+  image("images/diagram.png", width: 90%),
+  source: [Джерело: Власна розробка.],
 )
 ```
 

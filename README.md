@@ -369,8 +369,9 @@ For quotations of 5 lines or more (single-spaced, 0.25" left indent, double-spac
 
 ---
 
-### 14. Tables — `#dmin-table(...)`
+### 14. Tables — `#dmin-table(...)` and `#dmin-table-isolated(...)`
 
+#### Standard Table in Text:
 ```typst
 #dmin-table(
   number: 1, // or auto
@@ -388,10 +389,25 @@ For quotations of 5 lines or more (single-spaced, 0.25" left indent, double-spac
 )
 ```
 
+#### Isolated Table on Dedicated Page (AU DMin Manual, Rule 3):
+When a table occupies half a page or more, or when you wish to place it on its own page without preceding or trailing body text, use `#dmin-table-isolated(...)`. It automatically wraps the table with `#pagebreak(weak: true)` before and `#pagebreak()` after:
+
+```typst
+#dmin-table-isolated(
+  title: "Responsibility Assignment Matrix (RACI)",
+  table(
+    columns: (2.6fr, 1fr, 1.2fr, 1.2fr, 1.2fr),
+    ...
+  ),
+  note: [Note...],
+)
+```
+
 ---
 
-### 15. Figures & Illustrations — `#dmin-figure(...)`
+### 15. Figures & Illustrations — `#dmin-figure(...)` and `#dmin-figure-isolated(...)`
 
+#### Standard Figure in Text:
 ```typst
 #dmin-figure(
   number: 1, // or auto
@@ -400,6 +416,15 @@ For quotations of 5 lines or more (single-spaced, 0.25" left indent, double-spac
     #align(center + horizon)[Diagram or Chart Image]
   ],
   source: [Source: Adapted from Leadership Guide.],
+)
+```
+
+#### Isolated Figure on Dedicated Page:
+```typst
+#dmin-figure-isolated(
+  caption: "Organizational Structure Diagram",
+  image("images/diagram.png", width: 90%),
+  source: [Source: Author's elaboration.],
 )
 ```
 

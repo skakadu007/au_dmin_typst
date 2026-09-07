@@ -75,6 +75,14 @@
   ]
 }
 
+/// DMin Isolated Table — Chapter 2 (p. 7, Rule 3) & Exhibit F
+/// Placed on its own separate page (pagebreak before and after; no body text sharing the page)
+#let dmin-table-isolated(number: auto, title: "", table-content, note: none) = [
+  #pagebreak(weak: true)
+  #dmin-table(number: number, title: title, table-content, note: note)
+  #pagebreak()
+]
+
 /// DMin Figure — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
 /// Quadruple space (skip 3 lines = 36pt) before/after when on page with text
 #let dmin-figure(number: auto, caption: "", figure-content, source: none) = context {
@@ -93,6 +101,14 @@
     #source
   ]
 }
+
+/// DMin Isolated Figure — Chapter 2 (p. 7, Rule 3) & Exhibit F
+/// Placed on its own separate page (pagebreak before and after; no body text sharing the page)
+#let dmin-figure-isolated(number: auto, caption: "", figure-content, source: none) = [
+  #pagebreak(weak: true)
+  #dmin-figure(number: number, caption: caption, figure-content, source: source)
+  #pagebreak()
+]
 
 /// Appendix Section — Chapter 2 (p. 11)
 /// If cover-sheet: true, creates a centered divider sheet (APPENDIX A + TITLE) and puts body on next page without repeating heading.
