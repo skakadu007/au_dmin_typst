@@ -239,7 +239,7 @@
           #align(left)[
             #block(width: 3.0in)[
               #set text(size: 12pt, weight: "bold")
-              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
               #it.body
             ]
           ]
@@ -258,7 +258,7 @@
           #align(left)[
             #block(width: 3.0in)[
               #set text(size: 12pt, weight: "regular")
-              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
               #it.body
             ]
           ]
