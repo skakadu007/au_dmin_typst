@@ -120,14 +120,14 @@
 // ==============================================================================
 
 #dmin-chapter(
-  title: "The Use of Science in Theology: Introduction and Historical Background",
+  title: "The Use of Science in Theology:\ Introduction and Historical Background",
 )
 
 // Level 1 subhead (centered, bold, title case) — per Exhibit I: "Introduction"
 #heading(level: 2)[Introduction]
 
 // Level 2 subhead (centered, not bold, title case)
-#heading(level: 3)[The Limits \ of Science]
+#heading(level: 3)[The Limits of Science]
 
 Science and religion are arguably the two most powerful forces in human culture. The nature of relations between these forces has been explored and debated for millennia @calvin1960. This dissertation continues that exploration and debate. This first chapter introduces the dissertation in terms of its (1) problem and purpose, (2) problem justification, (3) methodology, and (4) delimitations @knight2001.
 

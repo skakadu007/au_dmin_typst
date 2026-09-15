@@ -5,6 +5,7 @@
 
 #import "state.typ": *
 #import "i18n.typ": *
+#import "layout.typ": word-double-leading, word-single-leading, word-space-skip-1, word-space-skip-2, word-space-skip-3
 
 /// Blank Flyleaf Page (First and Last page of bound dissertation)
 /// Completely empty, unnumbered, and uncounted
@@ -29,17 +30,17 @@
   set page(footer: none)
   v(2.0in) // 1.0in margin + 2.0in = 3.0in from top edge
   align(center)[
-    #set par(leading: 6pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
     #text(size: 12pt)[#s.abstract]
   ]
   v(1.0in)
   align(center)[
-    #set par(leading: if title-lines >= 3 { 6pt } else { 12pt }, first-line-indent: 0pt)
+    #set par(leading: if title-lines >= 3 { word-single-leading } else { word-double-leading }, first-line-indent: 0pt)
     #text(size: 12pt)[#upper(disp-title)]
   ]
   v(1.4in)
   align(center)[
-    #set par(leading: 12pt, first-line-indent: 0pt)
+    #set par(leading: word-double-leading, first-line-indent: 0pt)
     #text(size: 12pt)[
       #if s.by != "" [#s.by \ ]
       #v(6pt)
@@ -48,7 +49,7 @@
   ]
   v(0.6in)
   align(center)[
-    #set par(leading: 6pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
     #text(size: 12pt)[#s.adviser #disp-adviser]
   ]
   pagebreak()
@@ -82,46 +83,46 @@
   set page(footer: none)
   v(1.0in)
   align(center)[
-    #set par(leading: 6pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
     #text(weight: "regular")[#s.abstract_header]\
-    #v(12pt)
+    #v(word-space-skip-1)
     #text(weight: "regular")[#s.dissertation_type]\
-    #v(24pt)
+    #v(word-space-skip-2)
     #text(weight: "regular")[#disp-univ]\
-    #v(12pt)
+    #v(word-space-skip-1)
     #text(weight: "regular")[#disp-school]\
   ]
-  v(0.6in)
+  v(0.4in)
   align(left)[
-    #set par(leading: 6pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
     #grid(
       columns: (auto, 1fr),
       gutter: 8pt,
       [#s.title_label], [#upper(disp-title)],
     )
-    #v(12pt)
+    #v(word-space-skip-1)
     #s.researcher_name #disp-author\
-    #v(12pt)
+    #v(word-space-skip-1)
     #s.adviser_name_degree #disp-adviser\
-    #v(12pt)
+    #v(word-space-skip-1)
     #s.date_completed #disp-date
   ]
-  block(width: 100%, above: 36pt, below: 12pt, sticky: true)[
+  block(width: 100%, above: word-space-skip-3, below: word-space-skip-2, sticky: true)[
     #align(center)[#s.problem]
   ]
   problem
 
-  block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
+  block(width: 100%, above: word-space-skip-3, below: word-space-skip-2, sticky: true)[
     #align(center)[#s.method]
   ]
   method
 
-  block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
+  block(width: 100%, above: word-space-skip-3, below: word-space-skip-2, sticky: true)[
     #align(center)[#s.results]
   ]
   results
 
-  block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
+  block(width: 100%, above: word-space-skip-3, below: word-space-skip-2, sticky: true)[
     #align(center)[#s.conclusions]
   ]
   conclusions
@@ -150,7 +151,7 @@
   let disp-school = if school != auto { school } else { meta.school }
 
   let test-block = block(width: 5.5in)[
-    #set par(leading: 12pt, first-line-indent: 0pt, justify: false)
+    #set par(leading: word-double-leading, first-line-indent: 0pt, justify: false)
     #set text(size: 12pt)
     #upper(disp-title)
   ]
@@ -160,7 +161,7 @@
   } else {
     title-lines >= 3
   }
-  let title-leading = if is-multi-line { 6pt } else { 12pt }
+  let title-leading = if is-multi-line { word-single-leading } else { word-double-leading }
 
   set page(footer: none)
 
@@ -168,7 +169,7 @@
   place(top + left, dy: 1.5in)[
     #block(width: 100%)[
       #set align(center)
-      #set par(leading: 6pt, first-line-indent: 0pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
       #text(size: 12pt)[#disp-univ\ \ #disp-school]
     ]
   ]
@@ -189,7 +190,7 @@
   place(top + left, dy: 5.0in)[
     #block(width: 100%)[
       #set align(center)
-      #set par(leading: 12pt, first-line-indent: 0pt)
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
       #text(size: 12pt)[
         #s.title_page_pres_1\
         #s.title_page_pres_2\
@@ -203,7 +204,7 @@
   place(top + left, dy: 7.5in)[
     #block(width: 100%)[
       #set align(center)
-      #set par(leading: 12pt, first-line-indent: 0pt)
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
       #text(size: 12pt)[
         #if s.by != "" [#s.by \ ]
         #disp-author\
@@ -236,13 +237,12 @@
   set page(footer: none, header: none)
   v(3.5in)
   align(center)[
-    #set par(leading: 6pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
     #set text(size: 12pt)
     #if content != auto [
       #content
     ] else [
       © Copyright by #disp-author #disp-year \
-      #v(6pt)
       #if au-dmin-lang.get() == "uk" [
         Всі права захищено
       ] else if au-dmin-lang.get() == "ru" [
@@ -289,14 +289,17 @@
   v(1.0in)
   align(center)[
     #block(width: 5.5in)[
-      #set par(leading: if title-lines >= 3 { 6pt } else { 12pt }, first-line-indent: 0pt)
+      #set par(
+        leading: if title-lines >= 3 { word-single-leading } else { word-double-leading },
+        first-line-indent: 0pt,
+      )
       #text(size: 12pt)[#upper(disp-title)]
     ]
   ]
   v(0.8in)
   align(center)[
     #block(width: 5.5in)[
-      #set par(leading: 6pt, first-line-indent: 0pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
       #text(size: 12pt)[
         #s.title_page_pres_1\
         #s.title_page_pres_2\
@@ -307,36 +310,45 @@
   ]
   v(0.8in)
   align(center)[
-    #set par(leading: 12pt, first-line-indent: 0pt)
+    #set par(leading: word-double-leading, first-line-indent: 0pt)
     #text(size: 12pt)[
       #if s.by != "" [#s.by \ ]
       #v(4pt)
-      #disp-author\
-      #v(16pt)
-      #s.approval_by
+      #disp-author \
     ]
   ]
   v(0.6in)
   align(left)[
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
+    #text(size: 12pt)[
+      #s.approval_by
+    ]
+  ]
+
+  v(0.4in)
+  align(left)[
     #set text(size: 12pt)
-    #set par(leading: 4pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
+    #let sig-block(body) = stack(
+      spacing: word-single-leading,
+      line(length: 2.7in),
+      body,
+    )
+
     #grid(
       columns: (1fr, 1fr),
       column-gutter: 0.5in,
-      row-gutter: 24pt,
-      [
-        #line(length: 2.7in)\
+      row-gutter: word-space-skip-3,
+      sig-block[
         #s.committee_adviser\
         #disp-advisor
       ],
-      [
-        #line(length: 2.7in)\
+      sig-block[
         #s.committee_director\
         #disp-director
       ],
 
-      [
-        #line(length: 2.7in)\
+      sig-block[
         #if disp-second != none [
           #s.committee_second\
           #disp-second
@@ -344,20 +356,17 @@
           #s.committee_second
         ]
       ],
-      [
-        #line(length: 2.7in)\
+      sig-block[
         #s.committee_dean\
         #disp-dean
       ],
 
-      if disp-third != none [
-        #line(length: 2.7in)\
-        #disp-third
-      ] else [
-        #line(length: 2.7in)
-      ],
-      [
-        #line(length: 2.7in)\
+      if disp-third != none {
+        sig-block[#disp-third]
+      } else {
+        sig-block[]
+      },
+      sig-block[
         #s.committee_date\
         #if disp-date-approved != "Month Day, Year" and disp-date-approved != auto [
           #disp-date-approved
@@ -373,7 +382,7 @@
   #v(2.5in)
   #align(center)[
     #block(width: 4.5in)[
-      #set par(leading: 12pt, first-line-indent: 0pt)
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
       #emph(content)
     ]
   ]
@@ -389,10 +398,10 @@
   if not show-page-number {
     set page(footer: none)
     v(1.0in)
-    block(width: 100%, below: 24pt)[
+    block(width: 100%, below: word-space-skip-2)[
       #align(center)[
         #set text(size: 12pt)
-        #set par(leading: 6pt, first-line-indent: 0pt)
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
         #context {
           let s = dmin-get-strings(au-dmin-lang.get())
           if title == auto { s.toc } else { upper(title) }
@@ -413,10 +422,10 @@
     )
   } else {
     v(1.0in)
-    block(width: 100%, below: 24pt)[
+    block(width: 100%, below: word-space-skip-2)[
       #align(center)[
         #set text(size: 12pt)
-        #set par(leading: 6pt, first-line-indent: 0pt)
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
         #context {
           let s = dmin-get-strings(au-dmin-lang.get())
           if title == auto { s.toc } else { upper(title) }
@@ -467,11 +476,12 @@
   let s = dmin-get-strings(au-dmin-lang.get())
   let display-title = if title == auto { s.list_abbreviations } else { upper(title) }
   heading(level: 1, numbering: none, outlined: true)[#display-title]
+  v(word-space-skip-2)
   align(left)[
-    #set par(leading: 6pt, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
     #grid(
       columns: (1.2in, 1fr),
-      row-gutter: 10pt,
+      row-gutter: word-space-skip-2,
       ..items
         .map(pair => (
           [#text(weight: "regular")[#pair.at(0)]],
@@ -487,7 +497,8 @@
   let s = dmin-get-strings(au-dmin-lang.get())
   let display-title = if title == auto { s.acknowledgments } else { upper(title) }
   heading(level: 1, numbering: none, outlined: true)[#display-title]
-  set par(leading: 12pt, first-line-indent: 0.5in, justify: false)
+  set par(leading: word-double-leading, first-line-indent: 0.5in, justify: false)
+  v(word-space-skip-2)
   body
 }
 
@@ -500,7 +511,7 @@
 
   heading(level: 1, numbering: none, outlined: true)[#display-title]
   align(left)[
-    #set par(leading: 12pt, first-line-indent: 0pt, justify: false)
+    #set par(leading: word-double-leading, first-line-indent: 0pt, justify: false)
     #content
   ]
 }

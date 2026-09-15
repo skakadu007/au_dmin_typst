@@ -6,6 +6,16 @@
 #import "state.typ": *
 #import "i18n.typ": *
 
+// ==============================================================================
+// 📏 Spacing Constants (Strictly integer pt values / MS Word & AU DMin Standard)
+// ==============================================================================
+#let word-single-leading = 0.65em      // Одинарний інтервал (14pt baseline)
+#let word-double-leading = 1.6em     // Подвійний інтервал (28pt baseline)
+#let word-space-skip-1 = 0.65em       // Double space (пропуск 1 одинарного рядка)
+#let word-space-skip-2 = 1.6em       // Triple space (пропуск 2 одинарних рядків)
+#let word-space-skip-3 = 3.2em       // Four spaces (пропуск 3 одинарних рядків)
+#let word-space-skip-4 = 4.8em       // Four spaces (пропуск 3 одинарних рядків)
+
 #let apply-dmin-layout(lang: "en", body) = {
   // ============================================================================
   // PAGE GEOMETRY — Chapter 3 (p. 12)
@@ -41,16 +51,18 @@
 
   // ============================================================================
   // SPACING — Chapter 3 (p. 12-13)
-  // All text: double-spaced (24pt baseline = 12pt font + 12pt leading)
+  // All text: double-spaced (28pt baseline = 14pt font box + 14pt leading)
   // Ragged right margin (NOT justified)
   // Paragraph indent: 0.5 inches
   // ============================================================================
   set par(
-    leading: 12pt,
-    spacing: 12pt,
+    leading: word-double-leading,
+    spacing: word-double-leading,
     first-line-indent: (amount: 0.5in, all: true),
     justify: false,
   )
+
+  show par: it => consecutive-subhead.update(false) + it
 
   // ============================================================================
   // FOOTNOTES — Chapter 5 (p. 21)
@@ -58,7 +70,7 @@
   // ============================================================================
   show footnote.entry: it => {
     set text(size: 10pt)
-    set par(leading: 5pt, spacing: 10pt, first-line-indent: 0.5in, justify: false)
+    set par(leading: 2pt, spacing: 12pt, first-line-indent: 0.5in, justify: false)
     it
   }
 
@@ -68,16 +80,17 @@
   set heading(numbering: none)
   show heading: it => {
     if it.level == 1 {
+      consecutive-subhead.update(true)
       if it.has("supplement") and it.supplement == [Appendix-cover] {
         // Handled by appendix cover sheet, do not render duplicate heading on content page
         none
       } else if it.has("supplement") and (it.supplement == [same-page] or repr(it.supplement) == "[same-page]") {
         // Section on same page without pagebreak (e.g., List of Tables right after List of Illustrations)
-        v(24pt)
-        block(width: 100%, below: 18pt)[
+        v(word-space-skip-2)
+        block(width: 100%, below: word-space-skip-1)[
           #align(center)[
             #set text(size: 12pt, weight: "regular")
-            #set par(leading: 12pt, justify: false, first-line-indent: 0pt)
+            #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
             #upper(it.body)
           ]
         ]
@@ -87,87 +100,170 @@
         v(1.0in)
         if it.numbering != none {
           if it.has("supplement") and it.supplement == [Appendix] {
-            block(width: 100%, below: 24pt)[
+            block(width: 100%, below: word-space-skip-2)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
-                #set par(leading: 12pt, justify: false, first-line-indent: 0pt)
                 #context {
                   let s = dmin-get-strings(au-dmin-lang.get())
                   [#s.appendix #appendix-counter.display("A") \ ]
                 }
-                #v(12pt)
-                #upper(it.body)
+                #v(word-space-skip-2)
+                #context {
+                  let user-lines = dmin-chapter-lines.get()
+                  let test-m = measure(block(width: 100%)[
+                    #set text(size: 12pt, weight: "regular")
+                    #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ])
+                  let title-leading = if user-lines != auto {
+                    if user-lines >= 3 { word-single-leading } else { word-double-leading }
+                  } else if test-m.height >= 35pt {
+                    word-single-leading
+                  } else {
+                    word-double-leading
+                  }
+                  block(width: 100%)[
+                    #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ]
+                }
               ]
             ]
           } else {
-            block(width: 100%, below: 24pt)[
+            block(width: 100%, below: word-space-skip-2)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
-                #set par(leading: 12pt, justify: false, first-line-indent: 0pt)
                 #context {
                   let s = dmin-get-strings(au-dmin-lang.get())
                   [#s.chapter #counter(heading).display("1") \ ]
                 }
-                #v(24pt)
-                #upper(it.body)
+                #v(word-space-skip-2)
+                #context {
+                  let user-lines = dmin-chapter-lines.get()
+                  let test-m = measure(block(width: 100%)[
+                    #set text(size: 12pt, weight: "regular")
+                    #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ])
+                  let title-leading = if user-lines != auto {
+                    if user-lines >= 3 { word-single-leading } else { word-double-leading }
+                  } else if test-m.height >= 35pt {
+                    word-single-leading
+                  } else {
+                    word-double-leading
+                  }
+                  block(width: 100%)[
+                    #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ]
+                }
               ]
             ]
           }
         } else {
-          block(width: 100%, below: 24pt)[
+          block(width: 100%, below: word-space-skip-2)[
             #align(center)[
               #set text(size: 12pt, weight: "regular")
-              #set par(leading: 12pt, justify: false, first-line-indent: 0pt)
-              #upper(it.body)
+              #context {
+                let user-lines = dmin-chapter-lines.get()
+                let test-m = measure(block(width: 100%)[
+                  #set text(size: 12pt, weight: "regular")
+                  #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
+                  #upper(it.body)
+                ])
+                let title-leading = if user-lines != auto {
+                  if user-lines >= 3 { word-single-leading } else { word-double-leading }
+                } else if test-m.height >= 35pt {
+                  word-single-leading
+                } else {
+                  word-double-leading
+                }
+                block(width: 100%)[
+                  #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                  #upper(it.body)
+                ]
+              }
             ]
           ]
         }
       }
     } else if it.level == 2 {
       // AU Level 1 Subheading: Centered, Bold, Title Case
-      // Triple space before (24pt); Double space after (12pt)
-      block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
-        #align(center)[
-          #block(width: 4.75in)[
-            #set text(size: 12pt, weight: "bold")
-            #set par(leading: 6pt, justify: false, first-line-indent: 0pt)
-            #it.body
+      // Triple space before (28pt); Double space after (14pt); Double space between consecutive subheads (14pt)
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(center)[
+            #block(width: 4.75in)[
+              #set text(size: 12pt, weight: "bold")
+              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
           ]
         ]
-      ]
+      }
     } else if it.level == 3 {
       // AU Level 2 Subheading: Centered, Regular (not bold), Title Case
-      block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
-        #align(center)[
-          #block(width: 4.75in)[
-            #set text(size: 12pt, weight: "regular")
-            #set par(leading: 6pt, justify: false, first-line-indent: 0pt)
-            #it.body
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(center)[
+            #block(width: 4.75in)[
+              #set text(size: 12pt, weight: "regular")
+              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
           ]
         ]
-      ]
+      }
     } else if it.level == 4 {
       // AU Level 3 Subheading: Left margin, Bold, Title Case
-      block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
-        #align(left)[
-          #block(width: 3.0in)[
-            #set text(size: 12pt, weight: "bold")
-            #set par(leading: 6pt, justify: false, first-line-indent: 0pt)
-            #it.body
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(left)[
+            #block(width: 3.0in)[
+              #set text(size: 12pt, weight: "bold")
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
           ]
         ]
-      ]
+      }
     } else if it.level == 5 {
       // AU Level 4 Subheading: Left margin, Regular (not bold), Sentence style
-      block(width: 100%, above: 24pt, below: 12pt, sticky: true)[
-        #align(left)[
-          #block(width: 3.0in)[
-            #set text(size: 12pt, weight: "regular")
-            #set par(leading: 6pt, justify: false, first-line-indent: 0pt)
-            #it.body
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(left)[
+            #block(width: 3.0in)[
+              #set text(size: 12pt, weight: "regular")
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
           ]
         ]
-      ]
+      }
     } else {
       it
     }
@@ -176,31 +272,37 @@
   // ============================================================================
   // TABLES AND FIGURES — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
   // ============================================================================
-  show figure.where(kind: table): it => block(width: 100%, above: 36pt, below: 36pt)[
-    #set align(left)
-    #set par(leading: 6pt, justify: false, first-line-indent: 0pt)
-    #if it.has("caption") and it.caption != none [
-      #context {
-        let s = dmin-get-strings(au-dmin-lang.get())
-        text(weight: "bold")[#s.table #it.counter.display(). #it.caption.body]
-      }
-      #v(6pt, weak: true)
+  show figure.where(kind: table): it => {
+    consecutive-subhead.update(false)
+    block(width: 100%, above: word-space-skip-4, below: word-space-skip-4)[
+      #set align(left)
+      #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+      #if it.has("caption") and it.caption != none [
+        #context {
+          let s = dmin-get-strings(au-dmin-lang.get())
+          text(weight: "bold")[#s.table #it.counter.display(). #it.caption.body]
+        }
+        #v(word-space-skip-2, weak: true)
+      ]
+      #it.body
     ]
-    #it.body
-  ]
+  }
 
-  show figure.where(kind: image): it => block(width: 100%, above: 36pt, below: 36pt)[
-    #set align(left)
-    #set par(leading: 6pt, justify: false, first-line-indent: 0pt)
-    #align(center)[#it.body]
-    #if it.has("caption") and it.caption != none [
-      #v(6pt, weak: true)
-      #context {
-        let s = dmin-get-strings(au-dmin-lang.get())
-        text(weight: "regular")[#s.figure #it.counter.display(). #it.caption.body]
-      }
+  show figure.where(kind: image): it => {
+    consecutive-subhead.update(false)
+    block(width: 100%, above: word-space-skip-4, below: word-space-skip-4)[
+      #set align(left)
+      #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+      #align(center)[#it.body]
+      #if it.has("caption") and it.caption != none [
+        #v(word-space-skip-2, weak: true)
+        #context {
+          let s = dmin-get-strings(au-dmin-lang.get())
+          text(weight: "regular")[#s.figure #it.counter.display(). #it.caption.body]
+        }
+      ]
     ]
-  ]
+  }
 
   // ============================================================================
   // TABLE OF CONTENTS & LIST ENTRIES — Exhibits E & F (p. 38-40)
@@ -217,7 +319,7 @@
 
     if it.element.func() == figure and it.element.kind == table {
       // List of Tables entry per Exhibit F (p. 40)
-      v(12pt, weak: true)
+      v(word-space-skip-3, weak: true)
       let cap = it.element.caption.body
       context {
         let num = it.element.counter.at(loc).first()
@@ -227,18 +329,18 @@
           [#num.],
           [
             #set par(
-              leading: 6pt,
+              leading: word-single-leading,
               first-line-indent: 0pt,
               justify: false,
             )
             #show linebreak: it => [#it#h(0.30in)]
-            #link(loc)[#cap]#fill-dots#h(12pt)#p-box
+            #link(loc)[#cap]#fill-dots#h(word-space-skip-2)#p-box
           ],
         )
       }
     } else if it.element.func() == figure and it.element.kind == image {
       // List of Illustrations entry per Exhibit F (p. 40)
-      v(12pt, weak: true)
+      v(word-space-skip-3, weak: true)
       let cap = it.element.caption.body
       context {
         let num = it.element.counter.at(loc).first()
@@ -248,12 +350,12 @@
           [#num.],
           [
             #set par(
-              leading: 6pt,
+              leading: word-single-leading,
               first-line-indent: 0pt,
               justify: false,
             )
             #show linebreak: it => [#it#h(0.30in)]
-            #link(loc)[#cap]#fill-dots#h(12pt)#p-box
+            #link(loc)[#cap]#fill-dots#h(word-space-skip-2)#p-box
           ],
         )
       }
@@ -262,29 +364,32 @@
         is-first-subhead.update(true)
         if is-roman {
           // Preliminary pages in TOC (e.g. LIST OF TABLES, ACKNOWLEDGMENTS) — Flush left
-          v(12pt, weak: true)
-          block(above: 12pt, below: 0pt)[
+          v(word-space-skip-2, weak: true)
+          block(above: word-space-skip-2, below: 0pt)[
             #set par(
-              leading: 6pt,
+              leading: word-single-leading,
               first-line-indent: 0pt,
               justify: false,
             )
-            #link(loc)[#upper(it.element.body)]#fill-dots#h(12pt)#p-box
+            #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
           ]
-        } else if it.element.has("supplement") and (it.element.supplement == [Appendix] or it.element.supplement == [Appendix-cover]) {
+        } else if (
+          it.element.has("supplement")
+            and (it.element.supplement == [Appendix] or it.element.supplement == [Appendix-cover])
+        ) {
           // Appendix entry per Exhibit E (p. 38-39)
           context {
             let s = dmin-get-strings(au-dmin-lang.get())
             let was-seen = seen-appendix.get()
             if not was-seen {
               seen-appendix.update(true)
-              v(12pt, weak: true)
-              block(width: 100%, above: 12pt, below: 6pt)[
-                #set par(first-line-indent: 0pt, leading: 6pt)
+              v(word-space-skip-2, weak: true)
+              block(width: 100%, above: word-space-skip-1, below: 6pt)[
+                #set par(first-line-indent: 0pt, leading: word-single-leading)
                 #s.appendix_word
               ]
             } else {
-              v(12pt, weak: true)
+              v(word-space-skip-2, weak: true)
             }
             let a-num = appendix-counter.at(loc)
             let letter = numbering("A.", ..a-num)
@@ -296,11 +401,11 @@
                   [#letter],
                   [
                     #set par(
-                      leading: 6pt,
+                      leading: word-single-leading,
                       first-line-indent: 0pt,
                       justify: false,
                     )
-                    #link(loc)[#upper(it.element.body)]#fill-dots#h(12pt)#p-box
+                    #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
                   ],
                 )
               ]
@@ -308,14 +413,14 @@
           }
         } else if it.element.numbering == none {
           // Unnumbered level 1 headings (REFERENCE LIST, VITA, etc.) — Flush left
-          v(12pt, weak: true)
-          block(above: 12pt, below: 0pt)[
+          v(word-space-skip-2, weak: true)
+          block(above: word-space-skip-2, below: 0pt)[
             #set par(
-              leading: 6pt,
+              leading: word-single-leading,
               first-line-indent: 0pt,
               justify: false,
             )
-            #link(loc)[#upper(it.element.body)]#fill-dots#h(12pt)#p-box
+            #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
           ]
         } else {
           // Chapter entry per Exhibit E (p. 38-39)
@@ -324,13 +429,13 @@
             let was-seen = seen-chapter.get()
             if not was-seen {
               seen-chapter.update(true)
-              v(12pt, weak: true)
-              block(width: 100%, above: 12pt, below: 6pt)[
-                #set par(first-line-indent: 0pt, leading: 6pt)
+              v(word-space-skip-2, weak: true)
+              block(width: 100%, above: word-space-skip-1, below: 6pt)[
+                #set par(first-line-indent: 0pt, leading: word-single-leading)
                 #s.chapter_word
               ]
             } else {
-              v(12pt, weak: true)
+              v(word-space-skip-1, weak: true)
             }
             let c-num = counter(heading).at(loc)
             let num = numbering(it.element.numbering, ..c-num)
@@ -342,11 +447,11 @@
                   [#num],
                   [
                     #set par(
-                      leading: 6pt,
+                      leading: word-single-leading,
                       first-line-indent: 0pt,
                       justify: false,
                     )
-                    #link(loc)[#upper(it.element.body)]#fill-dots#h(12pt)#p-box
+                    #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
                   ],
                 )
               ]
@@ -370,17 +475,17 @@
           let first = is-first-subhead.get()
           if first {
             is-first-subhead.update(false)
-            v(12pt, weak: true)
+            v(word-space-skip-2, weak: true)
           }
           block(above: 6pt, below: 6pt)[
             #pad(left: indent)[
               #set par(
-                leading: 6pt,
+                leading: word-single-leading,
                 first-line-indent: 0pt,
                 justify: false,
               )
               #show linebreak: it => [#it#h(0.30in)]
-              #link(loc)[#it.element.body]#fill-dots#h(12pt)#p-box
+              #link(loc)[#it.element.body]#fill-dots#h(word-space-skip-1)#p-box
             ]
           ]
         }

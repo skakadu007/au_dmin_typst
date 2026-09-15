@@ -5,8 +5,10 @@
 #let seen-chapter = state("au-dmin-seen-chapter", false)
 #let seen-appendix = state("au-dmin-seen-appendix", false)
 #let is-first-subhead = state("au-dmin-is-first-subhead", true)
+#let consecutive-subhead = state("au-dmin-consec-subhead", false)
 #let appendix-counter = counter("au-dmin-appendix")
 #let au-dmin-lang = state("au-dmin-lang", "en")
+#let dmin-chapter-lines = state("au-dmin-chapter-lines", auto)
 
 #let au-dmin-meta = state("au-dmin-meta", (
   title: "PROJECT DISSERTATION TITLE IN ALL CAPS",
