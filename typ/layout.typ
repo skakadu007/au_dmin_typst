@@ -107,6 +107,12 @@
   show par: it => consecutive-subhead.update(false) + it
 
   // ============================================================================
+  // BIBLIOGRAPHY — Chapter 5 & Appendix A
+  // Запобігання розриву окремих бібліографічних записів між сторінками
+  // ============================================================================
+  show bibliography: set grid.cell(breakable: false)
+
+  // ============================================================================
   // FOOTNOTES — Chapter 5 (p. 21)
   // 10pt font, single-spaced within, double space between, 0.5in indent
   // ============================================================================
@@ -172,14 +178,14 @@
               ]
             ]
           } else {
-            block(width: 100%, below: word-space-skip-2, sticky: true)[
+            block(width: 100%, below: word-space-skip-3, sticky: true)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
                 #context {
                   let s = dmin-get-strings(au-dmin-lang.get())
                   [#s.chapter #counter(heading).display("1") \ ]
                 }
-                #v(word-space-skip-2)
+                #v(word-space-skip-3)
                 #context {
                   let user-lines = dmin-chapter-lines.get()
                   let test-m = measure(block(width: 100%)[
@@ -243,7 +249,7 @@
           #align(center)[
             #block(width: 4.75in)[
               #set text(size: 12pt, weight: "bold")
-              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
               #it.body
             ]
           ]
@@ -262,7 +268,7 @@
           #align(center)[
             #block(width: 4.75in)[
               #set text(size: 12pt, weight: "regular")
-              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
               #it.body
             ]
           ]
@@ -281,7 +287,7 @@
           #align(left)[
             #block(width: 3.0in)[
               #set text(size: 12pt, weight: "bold")
-              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
               #it.body
             ]
           ]
@@ -300,7 +306,7 @@
           #align(left)[
             #block(width: 3.0in)[
               #set text(size: 12pt, weight: "regular")
-              #set par(leading: word-double-leading, justify: false, first-line-indent: 0pt)
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
               #it.body
             ]
           ]

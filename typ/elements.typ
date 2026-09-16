@@ -156,16 +156,22 @@
 ]
 
 /// Reference List — Chapter 5 & Appendix A
-#let dmin-bibliography(bib-file, style: "../csl/andrews-university-dmin-author-date.csl", title: auto) = context {
-  let s = dmin-get-strings(au-dmin-lang.get())
-  let display-title = if title == auto { s.ref_list } else { upper(title) }
-  heading(level: 1, numbering: none, outlined: true)[#display-title]
-  set par(
+#let dmin-bibliography(bib-file, style: "../csl/andrews-university-dmin-author-date.csl", title: auto) = [
+  #context {
+    let s = dmin-get-strings(au-dmin-lang.get())
+    let display-title = if title == auto { s.ref_list } else { upper(title) }
+    heading(level: 1, numbering: none, outlined: true)[#display-title]
+  }
+
+  // Забороняє розривати будь-яке окреме джерело навпіл між сторінками
+  #show bibliography: set grid.cell(breakable: false)
+
+  #set par(
     leading: word-single-leading,
     spacing: word-space-skip-2,
     hanging-indent: 0.5in,
     first-line-indent: 0pt,
     justify: false,
   )
-  bibliography(bib-file, style: style, title: none)
-}
+  #bibliography(bib-file, style: style, title: none)
+]
