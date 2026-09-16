@@ -16,6 +16,41 @@
 #let word-space-skip-3 = 3.2em       // Four spaces (пропуск 3 одинарних рядків)
 #let word-space-skip-4 = 4.8em       // Four spaces (пропуск 3 одинарних рядків)
 
+
+/// Helper to handle string/content line breaks with \ or \n and uppercase conversion
+#let format-title(t, to-upper: false) = {
+  if type(t) == str {
+    let s = if to-upper { upper(t) } else { t }
+    let s-norm = s.replace("\\", "\n")
+    let lines = s-norm.split("\n").map(l => l.trim()).filter(l => l.len() > 0)
+    if lines.len() > 1 {
+      lines.join(linebreak())
+    } else {
+      s
+    }
+  } else if type(t) == content {
+    if to-upper { upper(t) } else { t }
+  } else {
+    t
+  }
+}
+
+/// Helper to determine the number of lines in a title
+#let count-title-lines(t) = {
+  if type(t) == str {
+    let s-norm = t.replace("\\", "\n")
+    let lines = s-norm.split("\n").map(l => l.trim()).filter(l => l.len() > 0)
+    calc.max(1, lines.len())
+  } else if type(t) == content {
+    let rep = repr(t)
+    let breaks = rep.matches("linebreak").len()
+    breaks + 1
+  } else {
+    1
+  }
+}
+
+
 #let apply-dmin-layout(lang: "en", body) = {
   // ============================================================================
   // PAGE GEOMETRY — Chapter 3 (p. 12)
@@ -47,7 +82,14 @@
     font: ("Times New Roman", "Liberation Serif", "Nimbus Roman"),
     size: 12pt,
     lang: lang,
+    costs: (widow: 300%, orphan: 300%, runt: 300%),
+    hyphenate: false,
   )
+
+  // Запобігання висячим коротким прийменникам, сполучникам та числам з крапкою
+  show regex("(?:\b|^)([а-яА-ЯіІїЇєЄґҐa-zA-Z]{1,2}|[0-9]+\.)\s"): it => {
+    it.text.trim() + sym.space.nobreak
+  }
 
   // ============================================================================
   // SPACING — Chapter 3 (p. 12-13)
@@ -87,7 +129,7 @@
       } else if it.has("supplement") and (it.supplement == [same-page] or repr(it.supplement) == "[same-page]") {
         // Section on same page without pagebreak (e.g., List of Tables right after List of Illustrations)
         v(word-space-skip-2)
-        block(width: 100%, below: word-space-skip-1)[
+        block(width: 100%, below: word-space-skip-1, sticky: true)[
           #align(center)[
             #set text(size: 12pt, weight: "regular")
             #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
@@ -100,7 +142,7 @@
         v(1.0in)
         if it.numbering != none {
           if it.has("supplement") and it.supplement == [Appendix] {
-            block(width: 100%, below: word-space-skip-2)[
+            block(width: 100%, below: word-space-skip-2, sticky: true)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
                 #context {
@@ -130,7 +172,7 @@
               ]
             ]
           } else {
-            block(width: 100%, below: word-space-skip-2)[
+            block(width: 100%, below: word-space-skip-2, sticky: true)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
                 #context {
@@ -161,7 +203,7 @@
             ]
           }
         } else {
-          block(width: 100%, below: word-space-skip-2)[
+          block(width: 100%, below: word-space-skip-2, sticky: true)[
             #align(center)[
               #set text(size: 12pt, weight: "regular")
               #context {

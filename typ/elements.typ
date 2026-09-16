@@ -4,24 +4,10 @@
 
 #import "state.typ": *
 #import "i18n.typ": *
-#import "layout.typ": word-double-leading, word-single-leading, word-space-skip-1, word-space-skip-2, word-space-skip-3
-
-/// Helper to handle string/content line breaks with \ or \n
-#let format-title(t) = {
-  if type(t) == str {
-    if t.contains("\\") {
-      let parts = t.split("\\")
-      parts.map(p => p.trim()).join(linebreak())
-    } else if t.contains("\n") {
-      let parts = t.split("\n")
-      parts.map(p => p.trim()).join(linebreak())
-    } else {
-      t
-    }
-  } else {
-    t
-  }
-}
+#import "layout.typ": (
+  count-title-lines, format-title, word-double-leading, word-single-leading, word-space-skip-1, word-space-skip-2,
+  word-space-skip-3,
+)
 
 /// Chapter heading — Exhibit I
 /// Generates: CHAPTER N [triple space] TITLE IN ALL CAPS
@@ -29,30 +15,24 @@
 /// - 2 lines: double spacing (word-double-leading)
 /// - 3+ lines: single spacing (word-single-leading)
 #let dmin-chapter(title: "", lines: auto) = [
-  #let count = if type(title) == str {
-    if title.contains("\\") {
-      title.split("\\").len()
-    } else if title.contains("\n") {
-      title.split("\n").len()
-    } else {
-      auto
-    }
-  } else {
-    auto
-  }
-  #let effective-lines = if lines != auto { lines } else { count }
+  #let num-lines = if lines != auto { lines } else { count-title-lines(title) }
+  #let effective-lines = if num-lines > 1 { num-lines } else { auto }
   #dmin-chapter-lines.update(effective-lines)
   #let formatted = format-title(title)
   #heading(level: 1, numbering: "1.", outlined: true)[#formatted]
   #dmin-chapter-lines.update(auto)
+  #consecutive-subhead.update(true)
 ]
 
 /// Level 5 Subheading (AU Level 5): Run-in to paragraph
 /// Indented 0.5", Bold, sentence style, ends with period (Ch.2 p.10)
 /// Preceded by triple space (above: 28pt). Followed by double space (built into paragraph).
 /// Usage: #subhead5[Students feel responsible][When the students...]
-#let subhead5(title, body) = {
-  block(width: 100%, above: word-space-skip-2)[
+#let subhead5(title, body) = context {
+  let was-subhead = consecutive-subhead.get()
+  let abv = if was-subhead { 0pt } else { word-space-skip-2 }
+  consecutive-subhead.update(false)
+  block(width: 100%, above: abv, below: word-space-skip-1, sticky: true)[
     #par(first-line-indent: 0.5in)[
       #text(weight: "bold")[#title.]
       #h(0.3em)
@@ -65,7 +45,7 @@
 /// 5+ lines of quoted material; single-spaced; indented 0.25in (quarter inch)
 /// Double space before and after (above: 14pt, below: 14pt)
 #let blockquote(body) = [
-  #block(width: 100%, above: word-space-skip-2, below: word-space-skip-2)[
+  #block(width: 100%, above: word-space-skip-1, below: word-space-skip-1)[
     #pad(left: 0.25in)[
       #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt, justify: false)
       #set text(size: 12pt)
@@ -76,21 +56,24 @@
 
 /// DMin Table — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
 /// Quadruple space (skip 3 lines = 42pt) before/after when on page with text
-#let dmin-table(number: auto, title: "", table-content, note: none) = context {
+#let dmin-table(number: auto, title: "", table-content, note: none, breakable: false) = context {
   let s = dmin-get-strings(au-dmin-lang.get())
   let formatted = format-title(title)
+  let content = [
+    #table-content
+    #if note != none [
+      #v(6pt, weak: true)
+      #set text(size: 10pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #note
+    ]
+  ]
   figure(
-    table-content,
+    content,
     caption: figure.caption(position: top)[#formatted],
     kind: table,
     supplement: s.table,
   )
-  if note != none [
-    #v(4pt, weak: true)
-    #set text(size: 10pt)
-    #set par(leading: 0.8em, first-line-indent: 0pt)
-    #note
-  ]
 }
 
 /// DMin Isolated Table — Chapter 2 (p. 7, Rule 3) & Exhibit F
@@ -103,21 +86,24 @@
 
 /// DMin Figure — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
 /// Quadruple space (skip 3 lines = 42pt) before/after when on page with text
-#let dmin-figure(number: auto, caption: "", figure-content, source: none) = context {
+#let dmin-figure(number: auto, caption: "", figure-content, source: none, breakable: false) = context {
   let s = dmin-get-strings(au-dmin-lang.get())
   let formatted = format-title(caption)
+  let content = [
+    #figure-content
+    #if source != none [
+      #v(6pt, weak: true)
+      #set text(size: 10pt, weight: "regular")
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #source
+    ]
+  ]
   figure(
-    figure-content,
+    content,
     caption: figure.caption(position: bottom)[#formatted],
     kind: image,
     supplement: s.figure,
   )
-  if source != none [
-    #v(4pt, weak: true)
-    #set text(size: 10pt, weight: "regular")
-    #set par(leading: 2pt, first-line-indent: 0pt)
-    #source
-  ]
 }
 
 /// DMin Isolated Figure — Chapter 2 (p. 7, Rule 3) & Exhibit F

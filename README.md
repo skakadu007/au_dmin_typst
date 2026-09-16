@@ -184,6 +184,67 @@ typst watch --root . example/main.typ example/main.pdf
 
 ---
 
+### Step 7. Exporting to Microsoft Word (.docx)
+
+There are three reliable methods to export your dissertation or individual chapters into Microsoft Word (`.docx`):
+
+#### Method 1. Direct Conversion via `typort` (Recommended)
+
+`typort` is a specialized command-line utility designed specifically for converting Typst documents directly to Word (`.docx`). It preserves native Word heading styles, tables, lists, math formulas (OMML), and document hierarchy.
+
+##### 1. Install `typort` (one-time setup):
+Requires Rust/Cargo (included with Rust):
+```bash
+cargo install typort
+```
+> **💡 Tip for Linux / macOS:** If the command is not recognized after installation (`command not found`), ensure Cargo's binary directory is in your `PATH`:
+> ```bash
+> export PATH="$HOME/.cargo/bin:$PATH"
+> ```
+> Or invoke it via its direct path: `~/.cargo/bin/typort`.
+
+##### 2. Export commands:
+From the project root directory:
+```bash
+# Export the complete sample dissertation:
+typort --root . example/main.typ -o example/main.docx
+
+# Export a single chapter:
+typort --root . projects/Vashchynin_сhapter_3/chapter3.typ -o projects/Vashchynin_сhapter_3/chapter3.docx
+```
+> **⚠️ IMPORTANT**: Always specify the `--root .` flag so the compiler can locate the `typ/` module files.
+
+---
+
+#### Method 2. Conversion via Pandoc
+
+If [Pandoc](https://pandoc.org) (v3.1.2 or newer with Typst input support) is installed on your system:
+
+```bash
+# Install Pandoc (if not already installed):
+# Ubuntu/Debian: sudo apt install pandoc
+# macOS:         brew install pandoc
+# Windows:       winget install JohnMacFarlane.Pandoc
+
+# Export to Word:
+pandoc example/main.typ -o example/main.docx
+```
+
+---
+
+#### Method 3. Export via PDF with Open in Word (100% Visual Fidelity)
+
+If you need to guarantee pixel-perfect visual fidelity for preliminary pages (title page, approval page, abstract):
+1. Compile the document to PDF:
+   ```bash
+   typst compile --root . example/main.typ example/main.pdf
+   ```
+2. Open the resulting `.pdf` directly in **Microsoft Word**:
+   - In Word, go to **File → Open → Browse** and select `example/main.pdf`.
+   - Word will automatically convert the PDF into an editable Word document (`.docx`), preserving all coordinates, margins, fonts, and spacing.
+
+---
+
 ## 📖 Component & Function Reference
 
 Below is the complete reference of all available components with their parameters and defaults.
