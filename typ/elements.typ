@@ -32,13 +32,21 @@
   let was-subhead = consecutive-subhead.get()
   let abv = if was-subhead { 0pt } else { word-space-skip-2 }
   consecutive-subhead.update(false)
-  block(width: 100%, above: abv, below: word-space-skip-1, sticky: true)[
-    #par(first-line-indent: 0.5in)[
-      #text(weight: "bold")[#title.]
-      #h(0.3em)
-      #body
-    ]
-  ]
+  let formatted-title = if type(title) == str {
+    let t = title.trim()
+    if t.ends-with(".") { t } else { t + "." }
+  } else {
+    let r = repr(title)
+    if r.ends-with(".]") or r.ends-with(".\"") or r.ends-with(".") {
+      title
+    } else {
+      [#title.]
+    }
+  }
+  v(abv, weak: true)
+  text(weight: "bold")[#formatted-title]
+  [ ]
+  body
 }
 
 /// Block Quote — Chapter 3 (p. 12)

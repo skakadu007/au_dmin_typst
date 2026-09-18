@@ -432,7 +432,8 @@
 ]
 
 /// Exhibit E: Table of Contents
-#let dmin-toc(title: auto, show-page-number: true) = {
+/// AU DMin Manual (p. 7 & 9): TOC must reflect only first three levels of subheadings (depth: 4).
+#let dmin-toc(title: auto, show-page-number: true, depth: 4) = {
   seen-chapter.update(false)
   seen-appendix.update(false)
   is-first-subhead.update(true)
@@ -451,7 +452,7 @@
         }
       ]
     ]
-    outline(title: none)
+    outline(title: none, depth: depth)
     pagebreak()
     set page(
       numbering: "i",
@@ -485,7 +486,7 @@
         }
       ]
     ]
-    outline(title: none)
+    outline(title: none, depth: depth)
   }
 }
 

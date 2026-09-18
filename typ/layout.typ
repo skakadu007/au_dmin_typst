@@ -507,16 +507,20 @@
           }
         }
       } else {
-        // Subheadings (levels 2, 3, 4, 5) — Single-spaced per Exhibit E (p. 38-39)
+        // AU DMin Manual (p. 7, 9): TOC must reflect only the first 3 levels of subheadings (Typst levels 2, 3, 4).
+        // 4th and 5th levels of subheadings (Typst level > 4) are excluded.
+        if it.level > 4 {
+          return none
+        }
+
+        // Subheadings (levels 2, 3, 4) — Single-spaced per Exhibit E (p. 38-39)
         // With hanging indent on runover lines and manual line breaks (\).
         let indent = if it.level == 2 {
           0.9in
         } else if it.level == 3 {
           1.2in
-        } else if it.level == 4 {
-          1.5in
         } else {
-          1.8in
+          1.5in
         }
 
         context {
