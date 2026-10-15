@@ -1,0 +1,1900 @@
+==> typ/au-dmin.typ <==
+// ==============================================================================
+// 🎓 Andrews University Doctor of Ministry (AU DMin) Typst Template Library
+// Conforms to: Doctor of Ministry Project Writing Manual (4th Edition, Aug 2019)
+// Standards: Andrews University Standards for Written Work & Turabian (8th/9th ed.)
+// Supported Languages: en (English), uk (Ukrainian), ru (Russian), fr (French), es (Spanish)
+// ==============================================================================
+
+#import "state.typ": *
+#import "i18n.typ": *
+#import "layout.typ": *
+#import "elements.typ": *
+#import "preliminary.typ": *
+
+#let au-dmin(
+  title: "PROJECT DISSERTATION TITLE IN ALL CAPS",
+  author: "Author Full Name",
+  degree: "Doctor of Ministry",
+  advisor: "Advisor Name, Ph.D.",
+  second-reader: "Second Reader Name, D.Min.",
+  third-reader: none,
+  program-director: "Stanley E. Patterson, Ph.D.",
+  dean: "Jiří Moskala, Th.D., Ph.D.",
+  date: "Month Year",
+  university: "Andrews University",
+  school: "Seventh-day Adventist Theological Seminary",
+  date-approved: "Month Day, Year",
+  title_page_pres_1: auto,
+  title_page_pres_2: auto,
+  title_page_pres_3: auto,
+  lang: "en",
+  body,
+) = {
+  // Update global language & metadata states
+  au-dmin-lang.update(lang)
+  au-dmin-meta.update((
+    title: title,
+    author: author,
+    degree: degree,
+    advisor: advisor,
+    second-reader: second-reader,
+    third-reader: third-reader,
+    program-director: program-director,
+    dean: dean,
+    date: date,
+    university: university,
+    school: school,
+    date-approved: date-approved,
+    title_page_pres_1: title_page_pres_1,
+    title_page_pres_2: title_page_pres_2,
+    title_page_pres_3: title_page_pres_3,
+    lang: lang,
+  ))
+
+  // Apply layout, page geometry, typography, and show rules
+  apply-dmin-layout(lang: lang, body)
+}
+
+==> typ/elements.typ <==
+// ==============================================================================
+// 📌 AU DMin Text & Structural Elements
+// ==============================================================================
+
+#import "state.typ": *
+#import "i18n.typ": *
+#import "layout.typ": (
+  count-title-lines, format-title, word-double-leading, word-single-leading, word-space-skip-1, word-space-skip-2,
+  word-space-skip-3,
+)
+
+/// Chapter heading — Exhibit I
+/// Generates: CHAPTER N [triple space] TITLE IN ALL CAPS
+/// Spacing between lines of title (AU DMin Manual p. 13 & Exhibit I):
+/// - 2 lines: double spacing (word-double-leading)
+/// - 3+ lines: single spacing (word-single-leading)
+#let dmin-chapter(title: "", lines: auto) = [
+  #let num-lines = if lines != auto { lines } else { count-title-lines(title) }
+  #let effective-lines = if num-lines > 1 { num-lines } else { auto }
+  #dmin-chapter-lines.update(effective-lines)
+  #let formatted = format-title(title)
+  #heading(level: 1, numbering: "1.", outlined: true)[#formatted]
+  #dmin-chapter-lines.update(auto)
+  #consecutive-subhead.update(true)
+]
+
+/// Level 5 Subheading (AU Level 5): Run-in to paragraph
+/// Indented 0.5", Bold, sentence style, ends with period (Ch.2 p.10)
+/// Preceded by triple space (above: 28pt). Followed by double space (built into paragraph).
+/// Usage: #subhead5[Students feel responsible][When the students...]
+#let subhead5(title, body) = context {
+  let was-subhead = consecutive-subhead.get()
+  let abv = if was-subhead { 0pt } else { word-space-skip-2 }
+  consecutive-subhead.update(false)
+  let formatted-title = if type(title) == str {
+    let t = title.trim()
+    if t.ends-with(".") { t } else { t + "." }
+  } else {
+    let r = repr(title)
+    if r.ends-with(".]") or r.ends-with(".\"") or r.ends-with(".") {
+      title
+    } else {
+      [#title.]
+    }
+  }
+  v(abv, weak: true)
+  text(weight: "bold")[#formatted-title]
+  [ ]
+  body
+}
+
+/// Block Quote — Chapter 3 (p. 12)
+/// 5+ lines of quoted material; single-spaced; indented 0.25in (quarter inch)
+/// Double space before and after (above: 14pt, below: 14pt)
+#let blockquote(body) = [
+  #block(width: 100%, above: word-space-skip-1, below: word-space-skip-1)[
+    #pad(left: 0.25in)[
+      #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt, justify: false)
+      #set text(size: 12pt)
+      #body
+    ]
+  ]
+]
+
+/// DMin Table — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
+/// Quadruple space (skip 3 lines = 42pt) before/after when on page with text
+#let dmin-table(number: auto, title: "", table-content, note: none, breakable: false) = context {
+  let s = dmin-get-strings(au-dmin-lang.get())
+  let formatted = format-title(title)
+  let content = [
+    #table-content
+    #if note != none [
+      #v(6pt, weak: true)
+      #set text(size: 10pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #note
+    ]
+  ]
+  figure(
+    content,
+    caption: figure.caption(position: top)[#formatted],
+    kind: table,
+    supplement: s.table,
+  )
+}
+
+/// DMin Isolated Table — Chapter 2 (p. 7, Rule 3) & Exhibit F
+/// Placed on its own separate page (pagebreak before and after; no body text sharing the page)
+#let dmin-table-isolated(number: auto, title: "", table-content, note: none, breakable: false) = [
+  #pagebreak(weak: true)
+  #dmin-table(number: number, title: title, table-content, note: note, breakable: breakable)
+  #pagebreak()
+]
+
+/// DMin Figure — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
+/// Quadruple space (skip 3 lines = 42pt) before/after when on page with text
+#let dmin-figure(number: auto, caption: "", figure-content, source: none, breakable: false) = context {
+  let s = dmin-get-strings(au-dmin-lang.get())
+  let formatted = format-title(caption)
+  let content = [
+    #figure-content
+    #if source != none [
+      #v(6pt, weak: true)
+      #set text(size: 10pt, weight: "regular")
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #source
+    ]
+  ]
+  figure(
+    content,
+    caption: figure.caption(position: bottom)[#formatted],
+    kind: image,
+    supplement: s.figure,
+  )
+}
+
+/// DMin Isolated Figure — Chapter 2 (p. 7, Rule 3) & Exhibit F
+/// Placed on its own separate page (pagebreak before and after; no body text sharing the page)
+#let dmin-figure-isolated(number: auto, caption: "", figure-content, source: none) = [
+  #pagebreak(weak: true)
+  #dmin-figure(number: number, caption: caption, figure-content, source: source)
+  #pagebreak()
+]
+
+/// Appendix Section — Chapter 2 (p. 11)
+/// If cover-sheet: true, creates a centered divider sheet (APPENDIX A + TITLE) and puts body on next page without repeating heading.
+/// If cover-sheet: false (default), starts page with APPENDIX A + TITLE at top (2" margin) and body below.
+#let appendix-section(title: "", cover-sheet: false, body) = [
+  #let formatted = format-title(title)
+  #appendix-counter.step()
+  #if cover-sheet [
+    #pagebreak(weak: true)
+    #set page(footer: none)
+    #v(2.5in)
+    #align(center)[
+      #set text(size: 12pt)
+      #context {
+        let s = dmin-get-strings(au-dmin-lang.get())
+        [#s.appendix #appendix-counter.display("A") \ ]
+      }
+      #v(word-space-skip-2)
+      #context {
+        let test-m = measure(block(width: 100%)[
+          #set text(size: 12pt)
+          #set par(leading: 0pt, first-line-indent: 0pt)
+          #upper(formatted)
+        ])
+        let title-leading = if test-m.height >= 35pt { word-single-leading } else { word-double-leading }
+        block(width: 100%)[
+          #set par(leading: title-leading, first-line-indent: 0pt)
+          #upper(formatted)
+        ]
+      }
+    ]
+    #heading(level: 1, numbering: "A.", supplement: [Appendix-cover], outlined: true)[#formatted]
+    #pagebreak()
+    #set par(leading: word-double-leading, spacing: word-double-leading, first-line-indent: 0.5in, justify: false)
+    #body
+  ] else [
+    #heading(level: 1, numbering: "A.", supplement: [Appendix], outlined: true)[#formatted]
+    #set par(leading: word-double-leading, spacing: word-double-leading, first-line-indent: 0.5in, justify: false)
+    #body
+  ]
+]
+
+/// Reference List — Chapter 5 & Appendix A
+#let dmin-bibliography(bib-file, style: "../csl/andrews-university-dmin-author-date.csl", title: auto, full: false) = [
+  #context {
+    let s = dmin-get-strings(au-dmin-lang.get())
+    let display-title = if title == auto { s.ref_list } else { upper(title) }
+    heading(level: 1, numbering: none, outlined: true)[#display-title]
+  }
+
+  // Забороняє розривати будь-яке окреме джерело навпіл між сторінками
+  #show bibliography: set grid.cell(breakable: false)
+
+  #set par(
+    leading: word-single-leading,
+    spacing: word-space-skip-2,
+    hanging-indent: 0.5in,
+    first-line-indent: 0pt,
+    justify: false,
+  )
+  #bibliography(bib-file, style: style, title: none, full: full)
+]
+
+==> typ/i18n.typ <==
+// ==============================================================================
+// 🌐 Internationalization (i18n) Dictionary for AU DMin Template
+// Supported Languages: en (English), uk (Ukrainian), ru (Russian), fr (French), es (Spanish)
+// ==============================================================================
+
+#let dmin-i18n = (
+  en: (
+    chapter: "CHAPTER",
+    chapter_word: "Chapter",
+    appendix: "APPENDIX",
+    appendix_word: "Appendix",
+    table: "Table",
+    figure: "Figure",
+    toc: "TABLE OF CONTENTS",
+    list_tables: "LIST OF TABLES",
+    list_illustrations: "LIST OF ILLUSTRATIONS",
+    list_abbreviations: "LIST OF ABBREVIATIONS",
+    ref_list: "REFERENCE LIST",
+    vita: "VITA",
+    acknowledgments: "ACKNOWLEDGMENTS",
+    abstract: "ABSTRACT",
+    abstract_header: "ABSTRACT OF GRADUATE STUDENT RESEARCH",
+    dissertation_type: "Professional Dissertation",
+    by: "by",
+    adviser: "Adviser:",
+    researcher_name: "Name of researcher:",
+    adviser_name_degree: "Name and degree of faculty adviser:",
+    date_completed: "Date completed:",
+    title_label: "Title:",
+    problem: "Problem",
+    method: "Method",
+    results: "Results",
+    conclusions: "Conclusions",
+    title_page_pres_1: "A Professional Dissertation",
+    title_page_pres_2: "Presented in Partial Fulfillment",
+    title_page_pres_3: "of the Requirements for the Degree",
+    approval_by: "APPROVAL BY THE COMMITTEE:",
+    committee_adviser: "Adviser",
+    committee_director: "Director, DMin Program",
+    committee_second: "Second Reader",
+    committee_dean: "Dean, SDA Theological Seminary",
+    committee_date: "Date approved",
+  ),
+  uk: (
+    chapter: "РОЗДІЛ",
+    chapter_word: "Розділ",
+    appendix: "ДОДАТОК",
+    appendix_word: "Додаток",
+    table: "Таблиця",
+    figure: "Рисунок",
+    toc: "ЗМІСТ",
+    list_tables: "СПИСОК ТАБЛИЦЬ",
+    list_illustrations: "СПИСОК ІЛЮСТРАЦІЙ",
+    list_abbreviations: "СПИСОК СКОРОЧЕНЬ",
+    ref_list: "СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ",
+    vita: "ВІДОМОСТІ ПРО АВТОРА",
+    acknowledgments: "ПОДЯКИ",
+    abstract: "АНОТАЦІЯ",
+    abstract_header: "АНОТАЦІЯ ДОСЛІДЖЕННЯ ЗДОБУВАЧА",
+    dissertation_type: "Професійна дисертація",
+    by: "",
+    adviser: "Науковий Керівник:",
+    researcher_name: "Ім'я Дослідника:",
+    adviser_name_degree: "Ім'я та Науковий Ступінь Керівника:",
+    date_completed: "Дата Завершення:",
+    title_label: "Назва:",
+    problem: "Проблема",
+    method: "Метод",
+    results: "Результати",
+    conclusions: "Висновки",
+    title_page_pres_1: "Професійна Дисертація",
+    title_page_pres_2: "Подана на Здобуття",
+    title_page_pres_3: "Наукового Ступеня",
+    approval_by: "СХВАЛЕНО КОМІСІЄЮ:",
+    committee_adviser: "Науковий Керівник",
+    committee_director: "Директор Програми DMin",
+    committee_second: "Другий Рецензент",
+    committee_dean: "Декан Богословської Семінарії АСД",
+    committee_date: "Дата схвалення",
+  ),
+  ru: (
+    chapter: "ГЛАВА",
+    chapter_word: "Глава",
+    appendix: "ПРИЛОЖЕНИЕ",
+    appendix_word: "Приложение",
+    table: "Таблица",
+    figure: "Рисунок",
+    toc: "СОДЕРЖАНИЕ",
+    list_tables: "СПИСОК ТАБЛИЦ",
+    list_illustrations: "СПИСОК ИЛЛЮСТРАЦИЙ",
+    list_abbreviations: "СПИСОК СОКРАЩЕНИЙ",
+    ref_list: "СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ",
+    vita: "СВЕДЕНИЯ ОБ АВТОРЕ",
+    acknowledgments: "БЛАГОДАРНОСТИ",
+    abstract: "АННОТАЦИЯ",
+    abstract_header: "АННОТАЦИЯ ИССЛЕДОВАНИЯ СОИСКАТЕЛЯ",
+    dissertation_type: "Профессиональная диссертация",
+    by: "",
+    adviser: "Научный руководитель:",
+    researcher_name: "Имя исследователя:",
+    adviser_name_degree: "Имя и ученая степень руководителя:",
+    date_completed: "Дата завершения:",
+    title_label: "Название:",
+    problem: "Проблема",
+    method: "Метод",
+    results: "Результаты",
+    conclusions: "Выводы",
+    title_page_pres_1: "Профессиональная диссертация",
+    title_page_pres_2: "Представленная на соискание",
+    title_page_pres_3: "ученой степени",
+    approval_by: "ОДОБРЕНО КОМИССИЕЙ:",
+    committee_adviser: "Научный руководитель",
+    committee_director: "Директор программы DMin",
+    committee_second: "Второй рецензент",
+    committee_dean: "Декан богословской семинарии АСД",
+    committee_date: "Дата одобрения",
+  ),
+  fr: (
+    chapter: "CHAPITRE",
+    chapter_word: "Chapitre",
+    appendix: "ANNEXE",
+    appendix_word: "Annexe",
+    table: "Tableau",
+    figure: "Figure",
+    toc: "TABLE DES MATIÈRES",
+    list_tables: "LISTE DES TABLEAUX",
+    list_illustrations: "LISTE DES ILLUSTRATIONS",
+    list_abbreviations: "LISTE DES ABRÉVIATIONS",
+    ref_list: "RÉFÉRENCES BIBLIOGRAPHIQUES",
+    vita: "CURRICULUM VITAE",
+    acknowledgments: "REMERCIEMENTS",
+    abstract: "RÉSUMÉ",
+    abstract_header: "RÉSUMÉ DE LA RECHERCHE ÉTUDIANTE",
+    dissertation_type: "Thèse professionnelle",
+    by: "par",
+    adviser: "Directeur de recherche :",
+    researcher_name: "Nom du chercheur :",
+    adviser_name_degree: "Nom et titre du directeur de thèse :",
+    date_completed: "Date d'achèvement :",
+    title_label: "Titre :",
+    problem: "Problème",
+    method: "Méthode",
+    results: "Résultats",
+    conclusions: "Conclusions",
+    title_page_pres_1: "Une thèse professionnelle",
+    title_page_pres_2: "Présentée en vue de l'obtention",
+    title_page_pres_3: "des exigences pour le diplôme de",
+    approval_by: "APPROBATION PAR LE COMITÉ :",
+    committee_adviser: "Directeur de recherche",
+    committee_director: "Directeur du programme DMin",
+    committee_second: "Deuxième lecteur",
+    committee_dean: "Doyen de la Faculté de théologie",
+    committee_date: "Date d'approbation",
+  ),
+  es: (
+    chapter: "CAPÍTULO",
+    chapter_word: "Capítulo",
+    appendix: "APÉNDICE",
+    appendix_word: "Apéndice",
+    table: "Tabla",
+    figure: "Figura",
+    toc: "TABLA DE CONTENIDOS",
+    list_tables: "LISTA DE TABLAS",
+    list_illustrations: "LISTA DE ILUSTRACIONES",
+    list_abbreviations: "LISTA DE ABREVIATURAS",
+    ref_list: "LISTA DE REFERENCIAS",
+    vita: "CURRÍCULUM VITAE",
+    acknowledgments: "AGRADECIMIENTOS",
+    abstract: "RESUMEN",
+    abstract_header: "RESUMEN DE LA INVESTIGACIÓN DEL ESTUDIANTE",
+    dissertation_type: "Disertación profesional",
+    by: "por",
+    adviser: "Asesor:",
+    researcher_name: "Nombre del investigador:",
+    adviser_name_degree: "Nombre y título del asesor:",
+    date_completed: "Fecha de finalización:",
+    title_label: "Título:",
+    problem: "Problema",
+    method: "Método",
+    results: "Resultados",
+    conclusions: "Conclusiones",
+    title_page_pres_1: "Una disertación profesional",
+    title_page_pres_2: "Presentada en cumplimiento parcial",
+    title_page_pres_3: "de los requisitos para el título de",
+    approval_by: "APROBACIÓN DEL COMITÉ:",
+    committee_adviser: "Asesor",
+    committee_director: "Director del Programa DMin",
+    committee_second: "Segundo lector",
+    committee_dean: "Decano del Seminario Teológico",
+    committee_date: "Fecha de aprobación",
+  ),
+)
+
+#let dmin-get-strings(lang) = {
+  dmin-i18n.at(lang, default: dmin-i18n.en)
+}
+
+==> typ/layout.typ <==
+// ==============================================================================
+// 📐 AU DMin Layout, Typography, Spacing & Show Rules
+// Conforms to: Doctor of Ministry Project Writing Manual (4th Edition, Aug 2019)
+// ==============================================================================
+
+#import "state.typ": *
+#import "i18n.typ": *
+
+// ==============================================================================
+// 📏 Spacing Constants (Strictly integer pt values / MS Word & AU DMin Standard)
+// ==============================================================================
+#let word-single-leading = 2pt      // Одинарний інтервал (14pt baseline)
+#let word-double-leading = 16pt     // Подвійний інтервал (28pt baseline)
+#let word-space-skip-1 = 2pt       // Single space (пропуск 1 одинарного рядка)
+#let word-space-skip-2 = 16pt       // Double space (пропуск 2 одинарних рядків)
+#let word-space-skip-3 = 24pt       // Triple spaces (пропуск 3 одинарних рядків)
+#let word-space-skip-4 = 32pt       // Four spaces (пропуск 3 одинарних рядків)
+
+
+/// Helper to handle string/content line breaks with \ or \n and uppercase conversion
+#let format-title(t, to-upper: false) = {
+  if type(t) == str {
+    let s = if to-upper { upper(t) } else { t }
+    let s-norm = s.replace("\\", "\n")
+    let lines = s-norm.split("\n").map(l => l.trim()).filter(l => l.len() > 0)
+    if lines.len() > 1 {
+      lines.join(linebreak())
+    } else {
+      s
+    }
+  } else if type(t) == content {
+    if to-upper { upper(t) } else { t }
+  } else {
+    t
+  }
+}
+
+/// Helper to determine the number of lines in a title
+#let count-title-lines(t) = {
+  if type(t) == str {
+    let s-norm = t.replace("\\", "\n")
+    let lines = s-norm.split("\n").map(l => l.trim()).filter(l => l.len() > 0)
+    calc.max(1, lines.len())
+  } else if type(t) == content {
+    let rep = repr(t)
+    let breaks = rep.matches("linebreak").len()
+    breaks + 1
+  } else {
+    1
+  }
+}
+
+
+#let apply-dmin-layout(lang: "en", body) = {
+  // ============================================================================
+  // PAGE GEOMETRY — Chapter 3 (p. 12)
+  // Left margin: 1.5" (for binding); Right/Top/Bottom: 1.0"
+  // ============================================================================
+  set page(
+    paper: "us-letter",
+    margin: (
+      left: 1.5in,
+      right: 1.0in,
+      top: 1.0in,
+      bottom: 1.0in,
+    ),
+    header: none,
+    footer: context {
+      align(center)[
+        #text(size: 12pt)[
+          #counter(page).display()
+        ]
+      ]
+    },
+  )
+
+  // ============================================================================
+  // TYPOGRAPHY — Chapter 1 (p. 1)
+  // "Fonts similar to Times New Roman... serif... 10-12 points"
+  // ============================================================================
+  set text(
+    font: ("Times New Roman", "Liberation Serif", "Nimbus Roman"),
+    size: 12pt,
+    lang: lang,
+    top-edge: 0.8em,
+    bottom-edge: -0.2em,
+    costs: (widow: 300%, orphan: 300%, runt: 300%),
+    hyphenate: false,
+  )
+
+  // Запобігання висячим коротким прийменникам, сполучникам та числам з крапкою
+  show regex("(?:\b|^)([а-яА-ЯіІїЇєЄґҐa-zA-Z]{1,2}|[0-9]+\.)\s"): it => {
+    it.text.trim() + sym.space.nobreak
+  }
+
+  // ============================================================================
+  // SPACING — Chapter 3 (p. 12-13)
+  // All text: double-spaced (28pt baseline = 14pt font box + 14pt leading)
+  // Ragged right margin (NOT justified)
+  // Paragraph indent: 0.5 inches
+  // ============================================================================
+  set par(
+    leading: word-double-leading,
+    spacing: word-double-leading,
+    first-line-indent: (amount: 0.5in, all: true),
+    justify: false,
+  )
+
+  show par: it => consecutive-subhead.update(false) + it
+
+  // ============================================================================
+  // BIBLIOGRAPHY — Chapter 5 & Appendix A
+  // Запобігання розриву окремих бібліографічних записів між сторінками
+  // ============================================================================
+  show bibliography: set grid.cell(breakable: false)
+
+  // ============================================================================
+  // FOOTNOTES — Chapter 5 (p. 21)
+  // 10pt font, single-spaced within, double space between, 0.5in indent
+  // ============================================================================
+  show footnote.entry: it => {
+    set text(size: 10pt)
+    set par(leading: 2pt, spacing: 12pt, first-line-indent: 0.5in, justify: false)
+    it
+  }
+
+  // ============================================================================
+  // HEADINGS — Chapter 2 (p. 9-10) & Chapter 3 (p. 13-14) & Exhibit I
+  // ============================================================================
+  set heading(numbering: none)
+  show heading: it => {
+    if it.level == 1 {
+      consecutive-subhead.update(true)
+      if it.has("supplement") and it.supplement == [Appendix-cover] {
+        // Handled by appendix cover sheet, do not render duplicate heading on content page
+        none
+      } else if it.has("supplement") and (it.supplement == [same-page] or repr(it.supplement) == "[same-page]") {
+        // Section on same page without pagebreak (e.g., List of Tables right after List of Illustrations)
+        v(word-space-skip-2)
+        block(width: 100%, below: word-space-skip-1, sticky: true)[
+          #align(center)[
+            #set text(size: 12pt, weight: "regular")
+            #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+            #upper(it.body)
+          ]
+        ]
+      } else {
+        // Major Section / Chapter: 2" from top edge of paper (1.0in margin + 1.0in v)
+        pagebreak(weak: true)
+        v(1.0in)
+        if it.numbering != none {
+          if it.has("supplement") and it.supplement == [Appendix] {
+            block(width: 100%, below: word-space-skip-2, sticky: true)[
+              #align(center)[
+                #set text(size: 12pt, weight: "regular")
+                #context {
+                  let s = dmin-get-strings(au-dmin-lang.get())
+                  [#s.appendix #appendix-counter.display("A") \ ]
+                }
+                #v(word-space-skip-2)
+                #context {
+                  let user-lines = dmin-chapter-lines.get()
+                  let test-m = measure(block(width: 100%)[
+                    #set text(size: 12pt, weight: "regular")
+                    #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ])
+                  let title-leading = if user-lines != auto {
+                    if user-lines >= 3 { word-single-leading } else { word-double-leading }
+                  } else if test-m.height >= 35pt {
+                    word-single-leading
+                  } else {
+                    word-double-leading
+                  }
+                  block(width: 100%)[
+                    #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ]
+                }
+              ]
+            ]
+          } else {
+            block(width: 100%, below: word-space-skip-3, sticky: true)[
+              #align(center)[
+                #set text(size: 12pt, weight: "regular")
+                #context {
+                  let s = dmin-get-strings(au-dmin-lang.get())
+                  [#s.chapter #counter(heading).display("1") \ ]
+                }
+                #v(word-space-skip-3)
+                #context {
+                  let user-lines = dmin-chapter-lines.get()
+                  let test-m = measure(block(width: 100%)[
+                    #set text(size: 12pt, weight: "regular")
+                    #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ])
+                  let title-leading = if user-lines != auto {
+                    if user-lines >= 3 { word-single-leading } else { word-double-leading }
+                  } else if test-m.height >= 35pt {
+                    word-single-leading
+                  } else {
+                    word-double-leading
+                  }
+                  block(width: 100%)[
+                    #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                    #upper(it.body)
+                  ]
+                }
+              ]
+            ]
+          }
+        } else {
+          block(width: 100%, below: word-space-skip-2, sticky: true)[
+            #align(center)[
+              #set text(size: 12pt, weight: "regular")
+              #context {
+                let user-lines = dmin-chapter-lines.get()
+                let test-m = measure(block(width: 100%)[
+                  #set text(size: 12pt, weight: "regular")
+                  #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
+                  #upper(it.body)
+                ])
+                let title-leading = if user-lines != auto {
+                  if user-lines >= 3 { word-single-leading } else { word-double-leading }
+                } else if test-m.height >= 35pt {
+                  word-single-leading
+                } else {
+                  word-double-leading
+                }
+                block(width: 100%)[
+                  #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                  #upper(it.body)
+                ]
+              }
+            ]
+          ]
+        }
+      }
+    } else if it.level == 2 {
+      // AU Level 1 Subheading: Centered, Bold, Title Case
+      // Triple space before (28pt); Double space after (14pt); Double space between consecutive subheads (14pt)
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(center)[
+            #block(width: 4.75in)[
+              #set text(size: 12pt, weight: "bold")
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
+          ]
+        ]
+      }
+    } else if it.level == 3 {
+      // AU Level 2 Subheading: Centered, Regular (not bold), Title Case
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(center)[
+            #block(width: 4.75in)[
+              #set text(size: 12pt, weight: "regular")
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
+          ]
+        ]
+      }
+    } else if it.level == 4 {
+      // AU Level 3 Subheading: Left margin, Bold, Title Case
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(left)[
+            #block(width: 3.0in)[
+              #set text(size: 12pt, weight: "bold")
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
+          ]
+        ]
+      }
+    } else if it.level == 5 {
+      // AU Level 4 Subheading: Left margin, Regular (not bold), Sentence style
+      context {
+        let is-consec = (
+          it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
+        )
+        let was-subhead = consecutive-subhead.get()
+        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
+        consecutive-subhead.update(true)
+        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+          #align(left)[
+            #block(width: 3.0in)[
+              #set text(size: 12pt, weight: "regular")
+              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #it.body
+            ]
+          ]
+        ]
+      }
+    } else {
+      it
+    }
+  }
+
+  // ============================================================================
+  // TABLES AND FIGURES — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
+  // ============================================================================
+  show figure.where(kind: table): it => {
+    consecutive-subhead.update(false)
+    block(width: 100%, above: word-space-skip-4, below: word-space-skip-4)[
+      #set align(left)
+      #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+      #if it.has("caption") and it.caption != none [
+        #context {
+          let s = dmin-get-strings(au-dmin-lang.get())
+          text(weight: "bold")[#s.table #it.counter.display(). #it.caption.body]
+        }
+        #v(word-space-skip-2, weak: true)
+      ]
+      #it.body
+    ]
+  }
+
+  show figure.where(kind: image): it => {
+    consecutive-subhead.update(false)
+    block(width: 100%, above: word-space-skip-4, below: word-space-skip-4)[
+      #set align(left)
+      #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+      #align(center)[#it.body]
+      #if it.has("caption") and it.caption != none [
+        #v(word-space-skip-2, weak: true)
+        #context {
+          let s = dmin-get-strings(au-dmin-lang.get())
+          text(weight: "regular")[#s.figure #it.counter.display(). #it.caption.body]
+        }
+      ]
+    ]
+  }
+
+  // ============================================================================
+  // TABLE OF CONTENTS & LIST ENTRIES — Exhibits E & F (p. 38-40)
+  // ============================================================================
+  show outline.entry: it => {
+    set text(size: 12pt)
+    let loc = it.element.location()
+    let p-num = counter(page).at(loc)
+    let format = loc.page-numbering()
+    let is-roman = format != none and (format == "i" or format == "I")
+    let p = if format != none { numbering(format, ..p-num) } else { str(p-num.first()) }
+    let fill-dots = box(width: 1fr, repeat[ . ])
+    let p-box = box(width: 0.35in, align(right)[#link(loc)[#p]])
+
+    if it.element.func() == figure and it.element.kind == table {
+      // List of Tables entry per Exhibit F (p. 40)
+      v(word-space-skip-3, weak: true)
+      let cap = it.element.caption.body
+      context {
+        let num = it.element.counter.at(loc).first()
+        grid(
+          columns: (0.35in, 1fr),
+          align: (top + left, top + left),
+          [#num.],
+          [
+            #set par(
+              leading: word-single-leading,
+              first-line-indent: 0pt,
+              justify: false,
+            )
+            #show linebreak: it => [#it#h(0.30in)]
+            #link(loc)[#cap]#fill-dots#h(word-space-skip-2)#p-box
+          ],
+        )
+      }
+    } else if it.element.func() == figure and it.element.kind == image {
+      // List of Illustrations entry per Exhibit F (p. 40)
+      v(word-space-skip-3, weak: true)
+      let cap = it.element.caption.body
+      context {
+        let num = it.element.counter.at(loc).first()
+        grid(
+          columns: (0.35in, 1fr),
+          align: (top + left, top + left),
+          [#num.],
+          [
+            #set par(
+              leading: word-single-leading,
+              first-line-indent: 0pt,
+              justify: false,
+            )
+            #show linebreak: it => [#it#h(0.30in)]
+            #link(loc)[#cap]#fill-dots#h(word-space-skip-2)#p-box
+          ],
+        )
+      }
+    } else if it.element.func() == heading {
+      if it.level == 1 {
+        is-first-subhead.update(true)
+        if is-roman {
+          // Preliminary pages in TOC (e.g. LIST OF TABLES, ACKNOWLEDGMENTS) — Flush left
+          v(word-space-skip-2, weak: true)
+          block(above: word-space-skip-2, below: 0pt)[
+            #set par(
+              leading: word-single-leading,
+              first-line-indent: 0pt,
+              justify: false,
+            )
+            #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+          ]
+        } else if (
+          it.element.has("supplement")
+            and (it.element.supplement == [Appendix] or it.element.supplement == [Appendix-cover])
+        ) {
+          // Appendix entry per Exhibit E (p. 38-39)
+          context {
+            let s = dmin-get-strings(au-dmin-lang.get())
+            let was-seen = seen-appendix.get()
+            if not was-seen {
+              seen-appendix.update(true)
+              v(word-space-skip-2, weak: true)
+              block(width: 100%, above: word-space-skip-1, below: 6pt)[
+                #set par(first-line-indent: 0pt, leading: word-single-leading)
+                #s.appendix_word
+              ]
+            } else {
+              v(word-space-skip-2, weak: true)
+            }
+            let a-num = appendix-counter.at(loc)
+            let letter = numbering("A.", ..a-num)
+            block(above: 2pt, below: 0pt)[
+              #pad(left: 0.3in)[
+                #grid(
+                  columns: (0.3in, 1fr),
+                  align: (top + left, top + left),
+                  [#letter],
+                  [
+                    #set par(
+                      leading: word-single-leading,
+                      first-line-indent: 0pt,
+                      justify: false,
+                    )
+                    #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+                  ],
+                )
+              ]
+            ]
+          }
+        } else if it.element.numbering == none {
+          // Unnumbered level 1 headings (REFERENCE LIST, VITA, etc.) — Flush left
+          v(word-space-skip-2, weak: true)
+          block(above: word-space-skip-2, below: 0pt)[
+            #set par(
+              leading: word-single-leading,
+              first-line-indent: 0pt,
+              justify: false,
+            )
+            #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+          ]
+        } else {
+          // Chapter entry per Exhibit E (p. 38-39)
+          context {
+            let s = dmin-get-strings(au-dmin-lang.get())
+            let was-seen = seen-chapter.get()
+            if not was-seen {
+              seen-chapter.update(true)
+              v(word-space-skip-2, weak: true)
+              block(width: 100%, above: word-space-skip-1, below: 6pt)[
+                #set par(first-line-indent: 0pt, leading: word-single-leading)
+                #s.chapter_word
+              ]
+            } else {
+              v(word-space-skip-1, weak: true)
+            }
+            let c-num = counter(heading).at(loc)
+            let num = numbering(it.element.numbering, ..c-num)
+            block(above: 2pt, below: 0pt)[
+              #pad(left: 0.3in)[
+                #grid(
+                  columns: (0.3in, 1fr),
+                  align: (top + left, top + left),
+                  [#num],
+                  [
+                    #set par(
+                      leading: word-single-leading,
+                      first-line-indent: 0pt,
+                      justify: false,
+                    )
+                    #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+                  ],
+                )
+              ]
+            ]
+          }
+        }
+      } else {
+        // AU DMin Manual (p. 7, 9): TOC must reflect only the first 3 levels of subheadings (Typst levels 2, 3, 4).
+        // 4th and 5th levels of subheadings (Typst level > 4) are excluded.
+        if it.level > 4 {
+          return none
+        }
+
+        // Subheadings (levels 2, 3, 4) — Single-spaced per Exhibit E (p. 38-39)
+        // With hanging indent on runover lines and manual line breaks (\).
+        let indent = if it.level == 2 {
+          0.9in
+        } else if it.level == 3 {
+          1.2in
+        } else {
+          1.5in
+        }
+
+        context {
+          let first = is-first-subhead.get()
+          if first {
+            is-first-subhead.update(false)
+            v(word-space-skip-2, weak: true)
+          }
+          block(above: 6pt, below: 6pt)[
+            #pad(left: indent)[
+              #set par(
+                leading: word-single-leading,
+                first-line-indent: 0pt,
+                justify: false,
+              )
+              #show linebreak: it => [#it#h(0.30in)]
+              #link(loc)[#it.element.body]#fill-dots#h(word-space-skip-1)#p-box
+            ]
+          ]
+        }
+      }
+    }
+  }
+
+  body
+}
+
+==> typ/preliminary.typ <==
+// ==============================================================================
+// 📄 AU DMin Preliminary Pages (Chapter 7, Exhibits A–H)
+// Automatically retrieves metadata from au-dmin-meta unless overridden
+// ==============================================================================
+
+#import "state.typ": *
+#import "i18n.typ": *
+#import "layout.typ": (
+  count-title-lines, format-title, word-double-leading, word-single-leading, word-space-skip-1, word-space-skip-2,
+  word-space-skip-3,
+)
+
+/// Blank Flyleaf Page (First and Last page of bound dissertation)
+/// Completely empty, unnumbered, and uncounted
+#let blank-page() = {
+  page(header: none, footer: none)[]
+}
+
+/// Exhibit A: Abstract Title Page
+#let abstract-title-page(
+  title: auto,
+  author: auto,
+  adviser: auto,
+  title-lines: auto,
+) = {
+  pagebreak(weak: true)
+  set page(footer: none)
+  context {
+    let meta = au-dmin-meta.get()
+    let s = dmin-get-strings(au-dmin-lang.get())
+
+    let raw-title = if title != auto { title } else { meta.title }
+    let disp-author = if author != auto { author } else { meta.author }
+    let disp-adviser = if adviser != auto { adviser } else { meta.advisor }
+
+    let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
+    let title-leading = if num-lines >= 3 { word-single-leading } else { word-double-leading }
+    let formatted-title = format-title(raw-title, to-upper: true)
+
+    // [3" from top edge] = dy: 2.0in (1.0in margin + 2.0in)
+    place(top + left, dy: 2.0in)[
+      #block(width: 100%)[
+        #set align(center)
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #text(size: 12pt)[#s.abstract]
+      ]
+    ]
+
+    // [4" from top edge] = dy: 3.0in (1.0in margin + 3.0in)
+    place(top + left, dy: 3.0in)[
+      #block(width: 100%)[
+        #set align(center)
+        #block(width: 5.5in)[
+          #set par(leading: title-leading, first-line-indent: 0pt, justify: false)
+          #set text(size: 12pt)
+          #formatted-title
+        ]
+      ]
+    ]
+
+    // [6" from top edge] = dy: 5.0in (1.0in margin + 5.0in)
+    place(top + left, dy: 5.0in)[
+      #block(width: 100%)[
+        #set align(center)
+        #set par(leading: word-double-leading, first-line-indent: 0pt)
+        #text(size: 12pt)[
+          #if s.by != "" [#s.by \ ]
+          #v(6pt)
+          #disp-author
+        ]
+      ]
+    ]
+
+    // [7" from top edge] = dy: 6.0in (1.0in margin + 6.0in)
+    place(top + left, dy: 6.0in)[
+      #block(width: 100%)[
+        #set align(center)
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #text(size: 12pt)[#s.adviser #disp-adviser]
+      ]
+    ]
+  }
+  pagebreak()
+}
+
+/// Exhibit B: Abstract Body
+#let abstract-body(
+  title: auto,
+  author: auto,
+  degree: auto,
+  university: auto,
+  school: auto,
+  date: auto,
+  adviser: auto,
+  problem: [],
+  method: [],
+  results: [],
+  conclusions: [],
+) = {
+  pagebreak(weak: true)
+  set page(footer: none)
+  context {
+    let meta = au-dmin-meta.get()
+    let s = dmin-get-strings(au-dmin-lang.get())
+
+    let raw-title = if title != auto { title } else { meta.title }
+    let disp-author = if author != auto { author } else { meta.author }
+    let disp-degree = if degree != auto { degree } else { meta.degree }
+    let disp-univ = if university != auto { university } else { meta.university }
+    let disp-school = if school != auto { school } else { meta.school }
+    let disp-date = if date != auto { date } else { meta.date }
+    let disp-adviser = if adviser != auto { adviser } else { meta.advisor }
+
+    let formatted-title = format-title(raw-title, to-upper: true)
+
+    v(1.0in) // 2" from top edge
+    align(center)[
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #block(below: word-space-skip-1)[#s.abstract_header]
+      #block(below: word-space-skip-2)[#s.dissertation_type]
+      #block(below: word-space-skip-1)[#disp-univ]
+      #block(below: word-space-skip-2)[#disp-school]
+    ]
+    block(below: word-space-skip-2)[
+      #set par(leading: word-single-leading, first-line-indent: 0pt, justify: false)
+      #grid(
+        columns: 100%,
+        row-gutter: word-space-skip-1,
+        grid(
+          columns: (auto, 1fr),
+          column-gutter: 0.4em,
+          [#s.title_label], [#formatted-title],
+        ),
+        [#s.researcher_name #disp-author],
+        [#s.adviser_name_degree #disp-adviser],
+        [#s.date_completed #disp-date],
+      )
+    ]
+
+    set par(
+      leading: word-double-leading,
+      spacing: word-double-leading,
+      first-line-indent: (amount: 0.5in, all: true),
+      justify: false,
+    )
+
+    block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
+      #align(center)[#text(size: 12pt, weight: "bold")[#s.problem]]
+    ]
+    problem
+
+    block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
+      #align(center)[#text(size: 12pt, weight: "bold")[#s.method]]
+    ]
+    method
+
+    block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
+      #align(center)[#text(size: 12pt, weight: "bold")[#s.results]]
+    ]
+    results
+
+    block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
+      #align(center)[#text(size: 12pt, weight: "bold")[#s.conclusions]]
+    ]
+    conclusions
+  }
+  pagebreak()
+}
+
+/// Exhibit C: Title Page
+#let title-page(
+  title: auto,
+  author: auto,
+  degree: auto,
+  month-year: auto,
+  university: auto,
+  school: auto,
+  title-lines: auto,
+  title_page_pres_1: auto,
+  title_page_pres_2: auto,
+  title_page_pres_3: auto,
+  date: auto,
+) = context {
+  let meta = au-dmin-meta.get()
+  let s = dmin-get-strings(au-dmin-lang.get())
+
+  let raw-title = if title != auto { title } else { meta.title }
+  let disp-author = if author != auto { author } else { meta.author }
+  let disp-degree = if degree != auto { degree } else { meta.degree }
+  let disp-date = if date != auto { date } else if month-year != auto { month-year } else { meta.date }
+  let disp-univ = if university != auto { university } else { meta.university }
+  let disp-school = if school != auto { school } else { meta.school }
+
+  let disp-pres-1 = if title_page_pres_1 != auto {
+    title_page_pres_1
+  } else if "title_page_pres_1" in meta and meta.title_page_pres_1 != auto {
+    meta.title_page_pres_1
+  } else {
+    s.title_page_pres_1
+  }
+
+  let disp-pres-2 = if title_page_pres_2 != auto {
+    title_page_pres_2
+  } else if "title_page_pres_2" in meta and meta.title_page_pres_2 != auto {
+    meta.title_page_pres_2
+  } else {
+    s.title_page_pres_2
+  }
+
+  let disp-pres-3 = if title_page_pres_3 != auto {
+    title_page_pres_3
+  } else if "title_page_pres_3" in meta and meta.title_page_pres_3 != auto {
+    meta.title_page_pres_3
+  } else {
+    s.title_page_pres_3
+  }
+
+  let formatted-title = format-title(raw-title, to-upper: true)
+  let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
+  let title-leading = if num-lines >= 3 { word-single-leading } else { word-double-leading }
+
+  set page(footer: none)
+
+  // [2.5" from top edge] (dy: 1.5in below 1.0in top margin)
+  place(top + left, dy: 1.5in)[
+    #block(width: 100%)[
+      #set align(center)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #text(size: 12pt)[#disp-univ\ \ #disp-school]
+    ]
+  ]
+
+  // [4.5" from top edge] (dy: 3.5in below 1.0in top margin)
+  place(top + left, dy: 3.5in)[
+    #block(width: 100%)[
+      #set align(center)
+      #block(width: 5.5in)[
+        #set par(leading: title-leading, first-line-indent: 0pt, justify: false)
+        #set text(size: 12pt)
+        #formatted-title
+      ]
+    ]
+  ]
+
+  // [6.0" from top edge] (dy: 5.0in below 1.0in top margin)
+  place(top + left, dy: 5.0in)[
+    #block(width: 100%)[
+      #set align(center)
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
+      #text(size: 12pt)[
+        #disp-pres-1\
+        #disp-pres-2\
+        #disp-pres-3\
+        #disp-degree
+      ]
+    ]
+  ]
+
+  // [8.5" from top edge] (dy: 7.5in below 1.0in top margin)
+  place(top + left, dy: 7.5in)[
+    #block(width: 100%)[
+      #set align(center)
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
+      #text(size: 12pt)[
+        #if s.by != "" [#s.by \ ]
+        #disp-author\
+        #disp-date
+      ]
+    ]
+  ]
+
+  pagebreak()
+}
+
+/// Copyright Page (Placed immediately after Title Page and before Approval Page)
+/// Unnumbered and uncounted
+#let copyright-page(
+  author: auto,
+  year: auto,
+  content: auto,
+) = context {
+  let meta = au-dmin-meta.get()
+  let s = dmin-get-strings(au-dmin-lang.get())
+
+  let disp-author = if author != auto { author } else { meta.author }
+  let disp-year = if year != auto {
+    year
+  } else {
+    let m = meta.date.find(regex("\d{4}"))
+    if m != none { m } else { "2026" }
+  }
+
+  set page(footer: none, header: none)
+  v(3.5in)
+  align(center)[
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
+    #set text(size: 12pt)
+    #if content != auto [
+      #content
+    ] else [
+      © Copyright by #disp-author #disp-year \
+      #if au-dmin-lang.get() == "uk" [
+        Всі права захищено
+      ] else if au-dmin-lang.get() == "ru" [
+        Все права защищены
+      ] else if au-dmin-lang.get() == "fr" [
+        Tous droits réservés
+      ] else if au-dmin-lang.get() == "es" [
+        Todos los derechos reservados
+      ] else [
+        All Rights Reserved
+      ]
+    ]
+  ]
+  pagebreak()
+}
+
+/// Exhibit D: Approval Page
+#let approval-page(
+  title: auto,
+  author: auto,
+  degree: auto,
+  advisor: auto,
+  second-reader: auto,
+  third-reader: auto,
+  director: auto,
+  dean: auto,
+  date-approved: auto,
+  title-lines: auto,
+) = context {
+  let meta = au-dmin-meta.get()
+  let s = dmin-get-strings(au-dmin-lang.get())
+
+  let raw-title = if title != auto { title } else { meta.title }
+  let disp-author = if author != auto { author } else { meta.author }
+  let disp-degree = if degree != auto { degree } else { meta.degree }
+  let disp-advisor = if advisor != auto { advisor } else { meta.advisor }
+  let disp-second = if second-reader != auto { second-reader } else { meta.second-reader }
+  let disp-third = if third-reader != auto { third-reader } else { meta.third-reader }
+  let disp-director = if director != auto { director } else { meta.program-director }
+  let disp-dean = if dean != auto { dean } else { meta.dean }
+  let disp-date-approved = if date-approved != auto { date-approved } else { meta.date-approved }
+
+  let formatted-title = format-title(raw-title, to-upper: true)
+  let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
+  let title-leading = if num-lines >= 3 { word-single-leading } else { word-double-leading }
+
+  set page(footer: none)
+
+  // [2.0" from top edge] (dy: 1.0in below 1.0in top margin)
+  place(top + left, dy: 1.0in)[
+    #block(width: 100%)[
+      #set align(center)
+      #block(width: 5.5in)[
+        #set par(
+          leading: title-leading,
+          first-line-indent: 0pt,
+        )
+        #text(size: 12pt)[#formatted-title]
+      ]
+    ]
+  ]
+
+  // [3.5" from top edge] (dy: 2.5in below 1.0in top margin)
+  place(top + left, dy: 2.5in)[
+    #block(width: 100%)[
+      #set align(center)
+      #block(width: 5.5in)[
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #text(size: 12pt)[
+          #s.title_page_pres_1\
+          #s.title_page_pres_2\
+          #s.title_page_pres_3\
+          #disp-degree
+        ]
+      ]
+    ]
+  ]
+
+  // [5.0" from top edge] (dy: 4.0in below 1.0in top margin)
+  place(top + left, dy: 4.0in)[
+    #block(width: 100%)[
+      #set align(center)
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
+      #text(size: 12pt)[
+        #if s.by != "" [#s.by \ ]
+        #disp-author
+      ]
+    ]
+  ]
+
+  // [6.5" from top edge] (dy: 5.5in below 1.0in top margin)
+  place(top + left, dy: 5.5in)[
+    #block(width: 100%)[
+      #set align(left)
+      #set text(size: 12pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #block(below: word-space-skip-1)[#s.approval_by]
+
+      #let sig-block(body) = stack(
+        spacing: word-single-leading,
+        line(length: 2.7in),
+        body,
+      )
+
+      #grid(
+        columns: (1fr, 1fr),
+        column-gutter: 0.5in,
+        row-gutter: word-space-skip-3,
+        sig-block[
+          #s.committee_adviser\
+          #disp-advisor
+        ],
+        sig-block[
+          #s.committee_director\
+          #disp-director
+        ],
+
+        sig-block[
+          #if disp-second != none [
+            #s.committee_second\
+            #disp-second
+          ] else [
+            #s.committee_second
+          ]
+        ],
+        sig-block[
+          #s.committee_dean\
+          #disp-dean
+        ],
+
+        if disp-third != none {
+          sig-block[#disp-third]
+        } else {
+          sig-block[]
+        },
+        sig-block[
+          #s.committee_date\
+          #if disp-date-approved != "Month Day, Year" and disp-date-approved != auto [
+            #disp-date-approved
+          ]
+        ],
+      )
+    ]
+  ]
+
+  pagebreak()
+}
+
+/// Dedication Page
+#let dedication-page(content) = [
+  #v(2.5in)
+  #align(center)[
+    #block(width: 4.5in)[
+      #set par(leading: word-double-leading, first-line-indent: 0pt)
+      #emph(content)
+    ]
+  ]
+  #pagebreak()
+]
+
+/// Exhibit E: Table of Contents
+/// AU DMin Manual (p. 7 & 9): TOC must reflect only first three levels of subheadings (depth: 4).
+#let dmin-toc(title: auto, show-page-number: true, depth: 4) = {
+  seen-chapter.update(false)
+  seen-appendix.update(false)
+  is-first-subhead.update(true)
+  is-first-toc-entry.update(true)
+  pagebreak(weak: true)
+  if not show-page-number {
+    set page(footer: none)
+    v(1.0in)
+    block(width: 100%, below: word-space-skip-2)[
+      #align(center)[
+        #set text(size: 12pt, weight: "regular")
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #context {
+          let s = dmin-get-strings(au-dmin-lang.get())
+          if title == auto { s.toc } else { upper(title) }
+        }
+      ]
+    ]
+    outline(title: none, depth: depth)
+    pagebreak()
+    set page(
+      numbering: "i",
+      footer: context {
+        align(center)[
+          #text(size: 12pt)[
+            #counter(page).display("i")
+          ]
+        ]
+      },
+    )
+  } else {
+    set page(
+      numbering: "i",
+      footer: context {
+        align(center)[
+          #text(size: 12pt)[
+            #counter(page).display("i")
+          ]
+        ]
+      },
+    )
+    v(1.0in)
+    block(width: 100%, below: word-space-skip-2)[
+      #align(center)[
+        #set text(size: 12pt, weight: "regular")
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #context {
+          let s = dmin-get-strings(au-dmin-lang.get())
+          if title == auto { s.toc } else { upper(title) }
+        }
+      ]
+    ]
+    outline(title: none, depth: depth)
+  }
+}
+
+/// Exhibit F: List of Illustrations / Figures (Placed first per AU DMin Manual)
+#let list-of-illustrations(title: auto) = {
+  is-first-fig-entry.update(true)
+  heading(level: 1, numbering: none, outlined: true)[
+    #context {
+      let s = dmin-get-strings(au-dmin-lang.get())
+      if title == auto { s.list_illustrations } else { upper(title) }
+    }
+  ]
+  outline(
+    title: none,
+    target: figure.where(kind: image),
+  )
+}
+
+/// Exhibit F: List of Tables (Placed after List of Illustrations)
+/// Set pagebreak: true if you want it on a separate page; false (default) puts it on the same page as illustrations.
+#let list-of-tables(title: auto, pagebreak: false) = {
+  is-first-table-entry.update(true)
+  heading(
+    level: 1,
+    numbering: none,
+    supplement: if pagebreak { none } else { [same-page] },
+    outlined: true,
+  )[
+    #context {
+      let s = dmin-get-strings(au-dmin-lang.get())
+      if title == auto { s.list_tables } else { upper(title) }
+    }
+  ]
+  outline(
+    title: none,
+    target: figure.where(kind: table),
+  )
+}
+
+/// Exhibit G: List of Abbreviations
+#let list-of-abbreviations(title: auto, items: ()) = {
+  heading(level: 1, numbering: none, outlined: true)[
+    #context {
+      let s = dmin-get-strings(au-dmin-lang.get())
+      if title == auto { s.list_abbreviations } else { upper(title) }
+    }
+  ]
+  align(left)[
+    #set par(leading: word-single-leading, first-line-indent: 0pt)
+    #grid(
+      columns: (1.2in, 1fr),
+      row-gutter: word-space-skip-1,
+      ..items
+        .map(pair => (
+          [#text(weight: "regular")[#pair.at(0)]],
+          [#pair.at(1)],
+        ))
+        .flatten()
+    )
+  ]
+}
+
+/// Exhibit H: Preface / Acknowledgments
+#let preface-page(title: auto, body) = {
+  heading(level: 1, numbering: none, outlined: true)[
+    #context {
+      let s = dmin-get-strings(au-dmin-lang.get())
+      if title == auto { s.acknowledgments } else { upper(title) }
+    }
+  ]
+  set par(
+    leading: word-double-leading,
+    spacing: word-double-leading,
+    first-line-indent: (amount: 0.5in, all: true),
+    justify: false,
+  )
+  body
+}
+
+/// Vita Page — Chapter 2 (p. 5/11)
+#let vita-page(title: auto, author: auto, content) = {
+  heading(level: 1, numbering: none, outlined: true)[
+    #context {
+      let s = dmin-get-strings(au-dmin-lang.get())
+      if title == auto { s.vita } else { upper(title) }
+    }
+  ]
+  align(left)[
+    #set par(
+      leading: word-double-leading,
+      spacing: word-double-leading,
+      first-line-indent: 0pt,
+      justify: false,
+    )
+    #content
+  ]
+}
+
+==> typ/state.typ <==
+// ==============================================================================
+// 📌 AU DMin Template Global States & Counters
+// ==============================================================================
+
+#let seen-chapter = state("au-dmin-seen-chapter", false)
+#let seen-appendix = state("au-dmin-seen-appendix", false)
+#let is-first-subhead = state("au-dmin-is-first-subhead", true)
+#let is-first-toc-entry = state("au-dmin-is-first-toc-entry", true)
+#let is-first-fig-entry = state("au-dmin-is-first-fig-entry", true)
+#let is-first-table-entry = state("au-dmin-is-first-table-entry", true)
+#let consecutive-subhead = state("au-dmin-consec-subhead", false)
+#let appendix-counter = counter("au-dmin-appendix")
+#let au-dmin-lang = state("au-dmin-lang", "en")
+#let dmin-chapter-lines = state("au-dmin-chapter-lines", auto)
+
+#let au-dmin-meta = state("au-dmin-meta", (
+  title: "PROJECT DISSERTATION TITLE IN ALL CAPS",
+  author: "Author Full Name",
+  degree: "Doctor of Ministry",
+  advisor: "Advisor Name, Ph.D.",
+  second-reader: "Second Reader Name, D.Min.",
+  third-reader: none,
+  program-director: "Stanley E. Patterson, Ph.D.",
+  dean: "Jiří Moskala, Th.D., Ph.D.",
+  date: "Month Year",
+  university: "Andrews University",
+  school: "Seventh-day Adventist Theological Seminary",
+  date-approved: "Month Day, Year",
+  lang: "en",
+))
+
+==> example/main.typ <==
+#import "../typ/au-dmin.typ": *
+
+// ==============================================================================
+// 🎓 ANDREWS UNIVERSITY DOCTOR OF MINISTRY PROJECT DISSERTATION
+// Sample document demonstrating all formatting per the AU DMin Manual (4th ed.)
+// ==============================================================================
+
+#show: au-dmin.with(
+  title: "THE USE OF SCIENCE IN THEOLOGY:\ INTRODUCTION\ AND HISTORICAL BACKGROUND",
+  author: "Taras Shevchenko",
+  degree: "Doctor of Ministry",
+  advisor: "John A. Smith, Ph.D.",
+  second-reader: "David B. Williams, D.Min.",
+  third-reader: "Sarah M. Johnson, Ph.D.",
+  program-director: "Stanley E. Patterson, Ph.D.",
+  dean: "Jiří Moskala, Th.D., Ph.D.",
+  date: "August 2026",
+  lang: "en",
+)
+
+// 1. Порожня початкова сторінка (Blank Flyleaf Page)
+#blank-page()
+
+// ==============================================================================
+// ABSTRACT (Unnumbered and Uncounted) — Exhibits A & B
+// ==============================================================================
+
+// Exhibit A: Abstract Title Page (Takes title, author, adviser automatically from au-dmin)
+#abstract-title-page()
+
+// Exhibit B: Abstract Body with 4 structured sections (Takes metadata automatically)
+#abstract-body(
+  problem: [
+    Compensatory theological formulations frequently lack a coherent hermeneutical bridge when addressing contemporary scientific models in local pastoral leadership. This study investigates the extent to which pastoral integrative competency influences congregational resilience during faith-science controversies.
+  ],
+  method: [
+    A mixed-methods empirical design was employed. Thirty-six pastoral practitioners and 124 church leaders across North America participated in semi-structured qualitative interviews and quantitative evaluative assessments over a two-year longitudinal observation period.
+  ],
+  results: [
+    Significant variance was observed in pastoral confidence and constructive dialogue across educational backgrounds ($p < .01$). Integrative leadership training correlated positively with congregational health and retention of young adults during contentious scientific debates.
+  ],
+  conclusions: [
+    Methodological clarity regarding the distinct domains of biblical revelation and empirical inquiry is essential for effective 21st-century ministry. An integrative pastoral curriculum equips leaders to facilitate constructive, faith-affirming dialogue.
+  ],
+)
+
+// ==============================================================================
+// PRELIMINARY PAGES (Numbered in Roman Numerals: i, ii, iii...)
+// ==============================================================================
+
+// Exhibit C: Title Page (Takes title, author, degree, date automatically)
+#title-page()
+
+// 2. Сторінка копірайту (Copyright Page) — без нумерації між титулкою та схваленням
+#copyright-page()
+
+// Exhibit D: Approval Page (Takes committee & dissertation metadata automatically)
+#approval-page()
+
+// ---- Switch to Roman numeral page numbering starting at iii ----
+#set page(
+  numbering: "i",
+  footer: context {
+    align(center)[
+      #text(size: 12pt)[
+        #counter(page).display("i")
+      ]
+    ]
+  },
+)
+#counter(page).update(3)
+
+// Optional Dedication (p. iii)
+//#dedication-page[
+//  To my family, whose prayerful support and patience made this research possible.
+//]
+
+// Exhibit E: Table of Contents (p. iii or iv per manual)
+#dmin-toc(show-page-number: true)
+
+// Exhibit F: List of Illustrations & List of Tables (on same page)
+#list-of-illustrations()
+#list-of-tables(pagebreak: false)
+
+// Exhibit G: List of Abbreviations
+#list-of-abbreviations(items: (
+  ("AUSS", "Andrews University Seminary Studies"),
+  ("BDAG", "Bauer, Danker, Arndt, and Gingrich, Greek-English Lexicon of the New Testament"),
+  ("GC", "General Conference of Seventh-day Adventists"),
+  ("JATS", "Journal of the Adventist Theological Society"),
+  ("TDOT", "Theological Dictionary of the Old Testament"),
+  ("WBC", "Word Biblical Commentary"),
+))
+
+// Exhibit H: Preface
+#preface-page(title: auto)[
+  This dissertation represents an effort to bridge the conceptual gap between theological education and empirical scientific developments. The motivation for this research stems from pastoral experiences where parishioners sought biblically faithful yet intellectually robust answers to complex contemporary questions.
+
+  I express profound gratitude to my project advisor, Dr. John A. Smith, whose rigorous mentorship shaped this research, and to the faculty of the Seventh-day Adventist Theological Seminary at Andrews University.
+]
+
+// ==============================================================================
+// MAIN BODY OF TEXT (Arabic Page Numbering: 1, 2, 3...)
+// ==============================================================================
+
+#set page(
+  numbering: "1",
+  footer: context {
+    align(center)[
+      #text(size: 12pt)[
+        #counter(page).display("1")
+      ]
+    ]
+  },
+)
+#counter(page).update(1)
+
+// ==============================================================================
+// CHAPTER 1 — Exhibit I: Sample page showing spacing, margins, subheadings
+// ==============================================================================
+
+#dmin-chapter(
+  title: "The Use of Science in Theology:\ Introduction and Historical Background",
+)
+
+// Level 1 subhead (centered, bold, title case) — per Exhibit I: "Introduction"
+#heading(level: 2)[Introduction]
+
+// Level 2 subhead (centered, not bold, title case)
+#heading(level: 3)[The Limits of Science]
+
+Science and religion are arguably the two most powerful forces in human culture. The nature of relations between these forces has been explored and debated for millennia @calvin1960. This dissertation continues that exploration and debate. This first chapter introduces the dissertation in terms of its (1) problem and purpose, (2) problem justification, (3) methodology, and (4) delimitations @knight2001.
+
+For Langdon Gilkey, science and theology are "mutually interdependent" with regard to relations between their types of truth:
+
+#blockquote[
+  For both science and religion . . . the question of the relation of each to reality, of the truth each holds, is crucial---for both essentially represent a relation to reality that is cognitive or believed to be so. And thus, because science and religion are mutually interdependent, the issues of the truth of science and the truth of religion and of the relations between these sorts of truth represent fundamental concerns for each. @gilkey1989[p. 11]
+]
+
+Now that Gilkey's view of science has been surveyed, the nature of his model for theology and, therefore, for the use of empirical inquiry must be carefully delineated @canale2005.
+
+// Level 3 subhead (left margin, bold, title case) — per Exhibit I: "The Nature of Theology"
+#heading(level: 4)[The Nature of Theology]
+
+Seventh-day Adventist theology has maintained a dynamic posture toward scientific developments while upholding the authority of Scripture @andrews2024. In the historical evolution of Adventist higher education, tensions and synthesis were frequently observed @gc1995[p. 112].
+
+// Level 4 subhead (left margin, not bold, sentence case)
+#heading(level: 5)[Curricular innovations in ministerial training]
+
+The preparation of pastoral candidates requires intentional pedagogical structures that combine biblical exegetical rigor with contemporary leadership competencies @craigie1983.
+
+// Level 5 subhead (indented, bold, sentence case, run-in, ends with period)
+#subhead5[Students feel responsible][When the students actively participate in setting curriculum benchmarks, retention and practical application improve substantially @smith2018. Faculty collaboration plays a pivotal role in designing modular course structures.]
+
+// ==============================================================================
+// TABLES AND FIGURES — Chapter 2 (p.7-8) & Chapter 3 (p.13)
+// ==============================================================================
+
+#dmin-chapter(
+  title: "The Use of Science in Theology",
+)
+
+#heading(level: 2)[Quantitative Data and Research Visualizations]
+
+The empirical phase of the research gathered data on ministerial student preferences regarding DMin coursework flexibility and mentoring support.
+
+#dmin-table(
+  number: 1,
+  title: "Factors influencing students' choice of \ Andrews University DMin program (N = 24)",
+  table(
+    columns: (3.2in, 1.5in),
+    stroke: (x, y) => if y == 0 { (bottom: 1pt + black, top: 1pt + black) } else if y == 4 {
+      (bottom: 1pt + black)
+    } else { none },
+    align: (left, right),
+    [#text(weight: "bold")[Response Criterion]], [#text(weight: "bold")[Percentage (%)]],
+    [Flexible hybrid schedule], [30.2],
+    [Faculty mentoring quality], [22.1],
+    [Practical ministry relevance], [20.4],
+    [Academic reputation], [15.7],
+  ),
+  note: [Note. Data gathered from DMin cohort survey, Summer 2026.],
+)
+
+As illustrated in Table 1, course scheduling flexibility remains the predominant factor determining student enrollment decisions.
+
+#dmin-figure(
+  number: 1,
+  caption: "Structural components of the \ integrative ministerial formation model.",
+  rect(width: 4.5in, height: 1.5in, stroke: 1pt + luma(100), radius: 4pt)[
+    #align(center + horizon)[
+      #text(weight: "bold")[INTEGRATIVE MINISTERIAL FORMATION MODEL]\
+      #v(4pt)
+      #text(size: 10pt)[Biblical Exegesis $arrow.r$ Theological Reflection $arrow.r$ Pastoral Praxis]
+    ]
+  ],
+  source: [Source: Adapted from ministerial leadership training guidelines.],
+)
+
+// ==============================================================================
+// APPENDICES — Chapter 2 (p.11)
+// ==============================================================================
+
+#appendix-section(title: "RESEARCH QUESTIONNAIRE", cover-sheet: true)[
+  #heading(level: 2)[Ministerial Integration Survey Instrument]
+
+  The following questionnaire was administered to pastoral leaders participating in the DMin research cohort. All responses were collected anonymously.
+
+  1. How often do scientific or faith-science questions arise in your pastoral counseling and preaching?
+
+  2. What hermeneutical models do you find most helpful when addressing cross-disciplinary topics?
+
+]
+
+#appendix-section(title: "LETTERS OF PERMISSION")[
+  Official documentation confirming authorization from participating institutional review boards (IRB) and district ministry supervisors to conduct empirical field research.
+]
+
+// ==============================================================================
+// REFERENCE LIST — Chapter 5 & Appendix A
+// ==============================================================================
+
+#dmin-bibliography("../example/references.bib", title: auto)
+
+// ==============================================================================
+// VITA — Chapter 2 (p.5/11)
+// ==============================================================================
+
+#vita-page()[
+  #grid(
+    columns: (1.5in, 1fr),
+    row-gutter: 12pt,
+    [Personal:], [Born in Kyiv, Ukraine. Married with two children.],
+    [Education:],
+    [
+      - D.Min. in Leadership, Andrews University, Berrien Springs, MI, 2026.
+      - M.Div., Andrews University Theological Seminary, 2018.
+      - B.A. in Theology, Ukrainian Institute of Arts and Sciences, 2014.
+    ],
+
+    [Experience:],
+    [
+      - Senior Pastor, Central Church, 2018--present.
+      - Youth Pastor, Dnipro District, 2014--2016.
+    ],
+
+    [Publications:],
+    [
+      - "Integrative Pastoral Formation," *Journal of Applied Christian Leadership* 12, no. 1 (2025): 45--58.
+    ],
+  )
+]
+
+// 3. Порожня кінцева сторінка (Blank Flyleaf Page)
+#blank-page()

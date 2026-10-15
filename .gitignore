@@ -23,3 +23,7 @@ Thumbs.db
 
 # Typst output caches or temp files (optional / local)
 *.tmp
+
+# Skill
+.agents/*
+.agents/

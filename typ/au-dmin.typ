@@ -24,6 +24,9 @@
   university: "Andrews University",
   school: "Seventh-day Adventist Theological Seminary",
   date-approved: "Month Day, Year",
+  title_page_pres_1: auto,
+  title_page_pres_2: auto,
+  title_page_pres_3: auto,
   lang: "en",
   body,
 ) = {
@@ -42,6 +45,9 @@
     university: university,
     school: school,
     date-approved: date-approved,
+    title_page_pres_1: title_page_pres_1,
+    title_page_pres_2: title_page_pres_2,
+    title_page_pres_3: title_page_pres_3,
     lang: lang,
   ))
 

@@ -156,6 +156,10 @@ The preparation of pastoral candidates requires intentional pedagogical structur
 // TABLES AND FIGURES — Chapter 2 (p.7-8) & Chapter 3 (p.13)
 // ==============================================================================
 
+#dmin-chapter(
+  title: "The Use of Science in Theology",
+)
+
 #heading(level: 2)[Quantitative Data and Research Visualizations]
 
 The empirical phase of the research gathered data on ministerial student preferences regarding DMin coursework flexibility and mentoring support.

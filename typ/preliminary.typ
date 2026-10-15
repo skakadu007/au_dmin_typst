@@ -176,6 +176,10 @@
   university: auto,
   school: auto,
   title-lines: auto,
+  title_page_pres_1: auto,
+  title_page_pres_2: auto,
+  title_page_pres_3: auto,
+  date: auto,
 ) = context {
   let meta = au-dmin-meta.get()
   let s = dmin-get-strings(au-dmin-lang.get())
@@ -183,9 +187,33 @@
   let raw-title = if title != auto { title } else { meta.title }
   let disp-author = if author != auto { author } else { meta.author }
   let disp-degree = if degree != auto { degree } else { meta.degree }
-  let disp-date = if month-year != auto { month-year } else { meta.date }
+  let disp-date = if date != auto { date } else if month-year != auto { month-year } else { meta.date }
   let disp-univ = if university != auto { university } else { meta.university }
   let disp-school = if school != auto { school } else { meta.school }
+
+  let disp-pres-1 = if title_page_pres_1 != auto {
+    title_page_pres_1
+  } else if "title_page_pres_1" in meta and meta.title_page_pres_1 != auto {
+    meta.title_page_pres_1
+  } else {
+    s.title_page_pres_1
+  }
+
+  let disp-pres-2 = if title_page_pres_2 != auto {
+    title_page_pres_2
+  } else if "title_page_pres_2" in meta and meta.title_page_pres_2 != auto {
+    meta.title_page_pres_2
+  } else {
+    s.title_page_pres_2
+  }
+
+  let disp-pres-3 = if title_page_pres_3 != auto {
+    title_page_pres_3
+  } else if "title_page_pres_3" in meta and meta.title_page_pres_3 != auto {
+    meta.title_page_pres_3
+  } else {
+    s.title_page_pres_3
+  }
 
   let formatted-title = format-title(raw-title, to-upper: true)
   let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
@@ -220,9 +248,9 @@
       #set align(center)
       #set par(leading: word-double-leading, first-line-indent: 0pt)
       #text(size: 12pt)[
-        #s.title_page_pres_1\
-        #s.title_page_pres_2\
-        #s.title_page_pres_3\
+        #disp-pres-1\
+        #disp-pres-2\
+        #disp-pres-3\
         #disp-degree
       ]
     ]

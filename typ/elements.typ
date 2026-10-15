@@ -86,9 +86,9 @@
 
 /// DMin Isolated Table — Chapter 2 (p. 7, Rule 3) & Exhibit F
 /// Placed on its own separate page (pagebreak before and after; no body text sharing the page)
-#let dmin-table-isolated(number: auto, title: "", table-content, note: none) = [
+#let dmin-table-isolated(number: auto, title: "", table-content, note: none, breakable: false) = [
   #pagebreak(weak: true)
-  #dmin-table(number: number, title: title, table-content, note: note)
+  #dmin-table(number: number, title: title, table-content, note: note, breakable: breakable)
   #pagebreak()
 ]
 
@@ -164,7 +164,7 @@
 ]
 
 /// Reference List — Chapter 5 & Appendix A
-#let dmin-bibliography(bib-file, style: "../csl/andrews-university-dmin-author-date.csl", title: auto) = [
+#let dmin-bibliography(bib-file, style: "../csl/andrews-university-dmin-author-date.csl", title: auto, full: false) = [
   #context {
     let s = dmin-get-strings(au-dmin-lang.get())
     let display-title = if title == auto { s.ref_list } else { upper(title) }
@@ -181,5 +181,5 @@
     first-line-indent: 0pt,
     justify: false,
   )
-  #bibliography(bib-file, style: style, title: none)
+  #bibliography(bib-file, style: style, title: none, full: full)
 ]

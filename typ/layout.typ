@@ -9,12 +9,12 @@
 // ==============================================================================
 // 📏 Spacing Constants (Strictly integer pt values / MS Word & AU DMin Standard)
 // ==============================================================================
-#let word-single-leading = 0.65em      // Одинарний інтервал (14pt baseline)
-#let word-double-leading = 1.6em     // Подвійний інтервал (28pt baseline)
-#let word-space-skip-1 = 0.65em       // Double space (пропуск 1 одинарного рядка)
-#let word-space-skip-2 = 1.6em       // Triple space (пропуск 2 одинарних рядків)
-#let word-space-skip-3 = 3.2em       // Four spaces (пропуск 3 одинарних рядків)
-#let word-space-skip-4 = 4.8em       // Four spaces (пропуск 3 одинарних рядків)
+#let word-single-leading = 2pt      // Одинарний інтервал (14pt baseline)
+#let word-double-leading = 16pt     // Подвійний інтервал (28pt baseline)
+#let word-space-skip-1 = 2pt       // Single space (пропуск 1 одинарного рядка)
+#let word-space-skip-2 = 16pt       // Double space (пропуск 2 одинарних рядків)
+#let word-space-skip-3 = 24pt       // Triple spaces (пропуск 3 одинарних рядків)
+#let word-space-skip-4 = 32pt       // Four spaces (пропуск 3 одинарних рядків)
 
 
 /// Helper to handle string/content line breaks with \ or \n and uppercase conversion
@@ -82,6 +82,8 @@
     font: ("Times New Roman", "Liberation Serif", "Nimbus Roman"),
     size: 12pt,
     lang: lang,
+    top-edge: 0.8em,
+    bottom-edge: -0.2em,
     costs: (widow: 300%, orphan: 300%, runt: 300%),
     hyphenate: false,
   )
