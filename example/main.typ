@@ -6,7 +6,7 @@
 // ==============================================================================
 
 #show: au-dmin.with(
-  title: "THE USE OF SCIENCE IN THEOLOGY:\ INTRODUCTION\ AND HISTORICAL BACKGROUND",
+  title: "THE USE OF SCIENCE IN THEOLOGY:\ INTRODUCTION \ AND HISTORICAL BACKGROUND",
   author: "Taras Shevchenko",
   degree: "Doctor of Ministry",
   advisor: "John A. Smith, Ph.D.",
@@ -71,15 +71,16 @@
 #counter(page).update(3)
 
 // Optional Dedication (p. iii)
-//#dedication-page[
-//  To my family, whose prayerful support and patience made this research possible.
-//]
+#dedication-page[
+  To my family, whose prayerful support and patience made this research possible.
+]
 
 // Exhibit E: Table of Contents (p. iii or iv per manual)
 #dmin-toc(show-page-number: true)
 
 // Exhibit F: List of Illustrations & List of Tables (on same page)
 #list-of-illustrations()
+\ \
 #list-of-tables(pagebreak: false)
 
 // Exhibit G: List of Abbreviations

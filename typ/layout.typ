@@ -8,13 +8,15 @@
 
 // ==============================================================================
 // 📏 Spacing Constants (Strictly integer pt values / MS Word & AU DMin Standard)
+// Line box height at 12pt (top-edge: 0.8em, bottom-edge: -0.2em) = 12pt.
+// 1 single line baseline-to-baseline = 14pt.
 // ==============================================================================
-#let word-single-leading = 2pt      // Одинарний інтервал (14pt baseline)
-#let word-double-leading = 16pt     // Подвійний інтервал (28pt baseline)
-#let word-space-skip-1 = 2pt       // Single space (пропуск 1 одинарного рядка)
-#let word-space-skip-2 = 16pt       // Double space (пропуск 2 одинарних рядків)
-#let word-space-skip-3 = 24pt       // Triple spaces (пропуск 3 одинарних рядків)
-#let word-space-skip-4 = 32pt       // Four spaces (пропуск 3 одинарних рядків)
+#let word-single-leading = 2pt      // Single space (0 skipped lines: 14pt baseline - 12pt box = 2pt)
+#let word-double-leading = 16pt     // Double space (1 skipped line:  28pt baseline - 12pt box = 16pt)
+#let word-space-skip-1 = 16pt       // Double space (skip 1 single line  = 28pt baseline)
+#let word-space-skip-2 = 30pt       // Triple space (skip 2 single lines = 42pt baseline)
+#let word-space-skip-3 = 44pt       // Quadruple space (skip 3 single lines = 56pt baseline)
+#let word-space-skip-4 = 44pt       // Alias for quadruple space (4 spaces / skip 3 lines)
 
 
 /// Helper to handle string/content line breaks with \ or \n and uppercase conversion
@@ -35,7 +37,7 @@
   }
 }
 
-/// Helper to determine the number of lines in a title
+/// Helper to determine the number of manual line breaks in a title
 #let count-title-lines(t) = {
   if type(t) == str {
     let s-norm = t.replace("\\", "\n")
@@ -50,11 +52,31 @@
   }
 }
 
+/// Helper to measure actual rendered title lines within a given width (default 6.0in full text width)
+#let get-title-leading(body, user-lines, width: 6.0in) = {
+  if user-lines != auto {
+    if user-lines >= 3 { word-single-leading } else { word-double-leading }
+  } else {
+    let test-m = measure(block(width: width)[
+      #set text(size: 12pt, weight: "regular")
+      #set par(leading: 0pt, spacing: 0pt, justify: false, first-line-indent: 0pt)
+      #upper(body)
+    ])
+    // 1 line = 12pt, 2 lines = 24pt, 3+ lines >= 36pt
+    if test-m.height >= 30pt {
+      word-single-leading
+    } else {
+      word-double-leading
+    }
+  }
+}
+
 
 #let apply-dmin-layout(lang: "en", body) = {
   // ============================================================================
   // PAGE GEOMETRY — Chapter 3 (p. 12)
   // Left margin: 1.5" (for binding); Right/Top/Bottom: 1.0"
+  // Page numbers: 0.5" from bottom center (footer-descent: 0.5in)
   // ============================================================================
   set page(
     paper: "us-letter",
@@ -64,6 +86,7 @@
       top: 1.0in,
       bottom: 1.0in,
     ),
+    footer-descent: 0.5in,
     header: none,
     footer: context {
       align(center)[
@@ -89,13 +112,14 @@
   )
 
   // Запобігання висячим коротким прийменникам, сполучникам та числам з крапкою
-  show regex("(?:\b|^)([а-яА-ЯіІїЇєЄґҐa-zA-Z]{1,2}|[0-9]+\.)\s"): it => {
+  // Використовуємо [ ] замість \s, щоб регулярний вираз НЕ з'їдав переноси рядків (\n / \)
+  show regex("(?:\b|^)([а-яА-ЯіІїЇєЄґҐa-zA-Z]{1,2}|[0-9]+\.)[ ]"): it => {
     it.text.trim() + sym.space.nobreak
   }
 
   // ============================================================================
   // SPACING — Chapter 3 (p. 12-13)
-  // All text: double-spaced (28pt baseline = 14pt font box + 14pt leading)
+  // All text: double-spaced (28pt baseline = 12pt font box + 16pt leading)
   // Ragged right margin (NOT justified)
   // Paragraph indent: 0.5 inches
   // ============================================================================
@@ -115,12 +139,21 @@
   show bibliography: set grid.cell(breakable: false)
 
   // ============================================================================
-  // FOOTNOTES — Chapter 5 (p. 21)
-  // 10pt font, single-spaced within, double space between, 0.5in indent
+  // FOOTNOTES — Chapter 3 (p. 13) & Chapter 5 (p. 21)
+  // 10pt font, single-spaced within, double space between, 0.5in indent,
+  // 20-space separator line, double space after separator line.
   // ============================================================================
+  set footnote.entry(
+    clearance: word-single-leading,
+    gap: word-space-skip-1,
+    separator: [
+      #line(length: 1.65in, stroke: 0.5pt)
+      #v(word-space-skip-1, weak: true)
+    ],
+  )
   show footnote.entry: it => {
     set text(size: 10pt)
-    set par(leading: 2pt, spacing: 12pt, first-line-indent: 0.5in, justify: false)
+    set par(leading: 2pt, spacing: word-space-skip-1, first-line-indent: 0.5in, justify: false)
     it
   }
 
@@ -130,131 +163,116 @@
   set heading(numbering: none)
   show heading: it => {
     if it.level == 1 {
-      consecutive-subhead.update(true)
       if it.has("supplement") and it.supplement == [Appendix-cover] {
         // Handled by appendix cover sheet, do not render duplicate heading on content page
         none
       } else if it.has("supplement") and (it.supplement == [same-page] or repr(it.supplement) == "[same-page]") {
         // Section on same page without pagebreak (e.g., List of Tables right after List of Illustrations)
-        v(word-space-skip-2)
-        block(width: 100%, below: word-space-skip-1, sticky: true)[
+        // Quadruple space above (word-space-skip-3 = 44pt), triple space below (word-space-skip-2 = 30pt)
+        block(width: 100%, above: word-space-skip-3, below: word-space-skip-2, sticky: true)[
           #align(center)[
             #set text(size: 12pt, weight: "regular")
-            #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+            #set par(leading: word-single-leading, spacing: word-single-leading, justify: false, first-line-indent: 0pt)
             #upper(it.body)
           ]
+          #consecutive-subhead.update(true)
         ]
       } else {
         // Major Section / Chapter: 2" from top edge of paper (1.0in margin + 1.0in v)
         pagebreak(weak: true)
+        // Reset footnote counter on each new chapter per Chapter 5 (p. 21, Rule 2)
+        if it.numbering != none {
+          counter(footnote).update(0)
+        }
         v(1.0in)
         if it.numbering != none {
           if it.has("supplement") and it.supplement == [Appendix] {
-            block(width: 100%, below: word-space-skip-2, sticky: true)[
+            block(width: 100%, above: 0pt, below: word-space-skip-2, sticky: true)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
                 #context {
                   let s = dmin-get-strings(au-dmin-lang.get())
-                  [#s.appendix #appendix-counter.display("A") \ ]
+                  block(width: 100%, above: 0pt, below: word-space-skip-2)[
+                    #set par(leading: word-single-leading, first-line-indent: 0pt)
+                    #s.appendix #appendix-counter.display("A")
+                  ]
                 }
-                #v(word-space-skip-2)
                 #context {
                   let user-lines = dmin-chapter-lines.get()
-                  let test-m = measure(block(width: 100%)[
-                    #set text(size: 12pt, weight: "regular")
-                    #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
-                    #upper(it.body)
-                  ])
-                  let title-leading = if user-lines != auto {
-                    if user-lines >= 3 { word-single-leading } else { word-double-leading }
-                  } else if test-m.height >= 35pt {
-                    word-single-leading
-                  } else {
-                    word-double-leading
-                  }
-                  block(width: 100%)[
-                    #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                  let title-leading = get-title-leading(it.body, user-lines, width: 6.0in)
+                  block(width: 100%, above: 0pt, below: 0pt)[
+                    #set par(leading: title-leading, spacing: title-leading, justify: false, first-line-indent: 0pt)
                     #upper(it.body)
                   ]
                 }
               ]
+              #consecutive-subhead.update(true)
             ]
           } else {
-            block(width: 100%, below: word-space-skip-3, sticky: true)[
+            block(width: 100%, above: 0pt, below: word-space-skip-2, sticky: true)[
               #align(center)[
                 #set text(size: 12pt, weight: "regular")
                 #context {
                   let s = dmin-get-strings(au-dmin-lang.get())
-                  [#s.chapter #counter(heading).display("1") \ ]
+                  block(width: 100%, above: 0pt, below: word-space-skip-2)[
+                    #set par(leading: word-single-leading, first-line-indent: 0pt)
+                    #s.chapter #counter(heading).display("1")
+                  ]
                 }
-                #v(word-space-skip-3)
                 #context {
                   let user-lines = dmin-chapter-lines.get()
-                  let test-m = measure(block(width: 100%)[
-                    #set text(size: 12pt, weight: "regular")
-                    #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
-                    #upper(it.body)
-                  ])
-                  let title-leading = if user-lines != auto {
-                    if user-lines >= 3 { word-single-leading } else { word-double-leading }
-                  } else if test-m.height >= 35pt {
-                    word-single-leading
-                  } else {
-                    word-double-leading
-                  }
-                  block(width: 100%)[
-                    #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                  let title-leading = get-title-leading(it.body, user-lines, width: 6.0in)
+                  block(width: 100%, above: 0pt, below: 0pt)[
+                    #set par(leading: title-leading, spacing: title-leading, justify: false, first-line-indent: 0pt)
                     #upper(it.body)
                   ]
                 }
               ]
+              #consecutive-subhead.update(true)
             ]
           }
         } else {
-          block(width: 100%, below: word-space-skip-2, sticky: true)[
+          // Unnumbered Major Section (LIST OF ILLUSTRATIONS, PREFACE, REFERENCE LIST, VITA, etc.)
+          // Followed by triple space (word-space-skip-2 = 30pt) per p. 13 & Exhibits E-H
+          block(width: 100%, above: 0pt, below: word-space-skip-2, sticky: true)[
             #align(center)[
               #set text(size: 12pt, weight: "regular")
               #context {
                 let user-lines = dmin-chapter-lines.get()
-                let test-m = measure(block(width: 100%)[
-                  #set text(size: 12pt, weight: "regular")
-                  #set par(leading: 0pt, justify: false, first-line-indent: 0pt)
-                  #upper(it.body)
-                ])
-                let title-leading = if user-lines != auto {
-                  if user-lines >= 3 { word-single-leading } else { word-double-leading }
-                } else if test-m.height >= 35pt {
-                  word-single-leading
-                } else {
-                  word-double-leading
-                }
-                block(width: 100%)[
-                  #set par(leading: title-leading, justify: false, first-line-indent: 0pt)
+                let title-leading = get-title-leading(it.body, user-lines, width: 6.0in)
+                block(width: 100%, above: 0pt, below: 0pt)[
+                  #set par(leading: title-leading, spacing: title-leading, justify: false, first-line-indent: 0pt)
                   #upper(it.body)
                 ]
               }
             ]
+            #consecutive-subhead.update(true)
           ]
         }
       }
     } else if it.level == 2 {
       // AU Level 1 Subheading: Centered, Bold, Title Case
-      // Triple space before (28pt); Double space after (14pt); Double space between consecutive subheads (14pt)
+      // Triple space before (30pt); Double space after (16pt); Double space between consecutive subheads (16pt)
       context {
         let is-consec = (
           it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
         )
         let was-subhead = consecutive-subhead.get()
-        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
-        consecutive-subhead.update(true)
-        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+        let abv = if is-consec or was-subhead { word-space-skip-1 } else { word-space-skip-2 }
+        block(width: 100%, above: abv, below: word-space-skip-1, sticky: true)[
           #align(center)[
-            #block(width: 4.75in)[
+            #block(width: 4.75in, above: 0pt, below: 0pt)[
               #set text(size: 12pt, weight: "bold")
-              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                justify: false,
+                first-line-indent: 0pt,
+              )
               #it.body
             ]
           ]
+          #consecutive-subhead.update(true)
         ]
       }
     } else if it.level == 3 {
@@ -264,54 +282,69 @@
           it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
         )
         let was-subhead = consecutive-subhead.get()
-        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
-        consecutive-subhead.update(true)
-        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+        let abv = if is-consec or was-subhead { word-space-skip-1 } else { word-space-skip-2 }
+        block(width: 100%, above: abv, below: word-space-skip-1, sticky: true)[
           #align(center)[
-            #block(width: 4.75in)[
+            #block(width: 4.75in, above: 0pt, below: 0pt)[
               #set text(size: 12pt, weight: "regular")
-              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                justify: false,
+                first-line-indent: 0pt,
+              )
               #it.body
             ]
           ]
+          #consecutive-subhead.update(true)
         ]
       }
     } else if it.level == 4 {
-      // AU Level 3 Subheading: Left margin, Bold, Title Case
+      // AU Level 3 Subheading: Left margin, Bold, Title Case (max 3.0in width)
       context {
         let is-consec = (
           it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
         )
         let was-subhead = consecutive-subhead.get()
-        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
-        consecutive-subhead.update(true)
-        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+        let abv = if is-consec or was-subhead { word-space-skip-1 } else { word-space-skip-2 }
+        block(width: 100%, above: abv, below: word-space-skip-1, sticky: true)[
           #align(left)[
-            #block(width: 3.0in)[
+            #block(width: 3.0in, above: 0pt, below: 0pt)[
               #set text(size: 12pt, weight: "bold")
-              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                justify: false,
+                first-line-indent: 0pt,
+              )
               #it.body
             ]
           ]
+          #consecutive-subhead.update(true)
         ]
       }
     } else if it.level == 5 {
-      // AU Level 4 Subheading: Left margin, Regular (not bold), Sentence style
+      // AU Level 4 Subheading: Left margin, Regular (not bold), Sentence style (max 3.0in width)
       context {
         let is-consec = (
           it.has("supplement") and (it.supplement == [consecutive] or repr(it.supplement) == "[consecutive]")
         )
         let was-subhead = consecutive-subhead.get()
-        let abv = if is-consec or was-subhead { word-space-skip-2 } else { word-space-skip-3 }
-        consecutive-subhead.update(true)
-        block(width: 100%, above: abv, below: word-space-skip-2, sticky: true)[
+        let abv = if is-consec or was-subhead { word-space-skip-1 } else { word-space-skip-2 }
+        block(width: 100%, above: abv, below: word-space-skip-1, sticky: true)[
           #align(left)[
-            #block(width: 3.0in)[
+            #block(width: 3.0in, above: 0pt, below: 0pt)[
               #set text(size: 12pt, weight: "regular")
-              #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                justify: false,
+                first-line-indent: 0pt,
+              )
               #it.body
             ]
           ]
+          #consecutive-subhead.update(true)
         ]
       }
     } else {
@@ -321,41 +354,44 @@
 
   // ============================================================================
   // TABLES AND FIGURES — Chapter 2 (p. 7-8) & Chapter 3 (p. 13) & Exhibit F
+  // Quadruple space (word-space-skip-3 = 44pt) above and below when on page with text
   // ============================================================================
   show figure.where(kind: table): it => {
-    consecutive-subhead.update(false)
-    block(width: 100%, above: word-space-skip-4, below: word-space-skip-4)[
+    block(width: 100%, above: word-space-skip-3, below: word-space-skip-3)[
       #set align(left)
-      #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+      #set par(leading: word-single-leading, spacing: word-single-leading, justify: false, first-line-indent: 0pt)
       #if it.has("caption") and it.caption != none [
-        #context {
-          let s = dmin-get-strings(au-dmin-lang.get())
-          text(weight: "bold")[#s.table #it.counter.display(). #it.caption.body]
-        }
-        #v(word-space-skip-2, weak: true)
+        #block(width: 100%, above: 0pt, below: word-space-skip-1)[
+          #context {
+            let s = dmin-get-strings(au-dmin-lang.get())
+            text(weight: "bold")[#s.table #it.counter.display(). #it.caption.body]
+          }
+        ]
       ]
       #it.body
+      #consecutive-subhead.update(false)
     ]
   }
 
   show figure.where(kind: image): it => {
-    consecutive-subhead.update(false)
-    block(width: 100%, above: word-space-skip-4, below: word-space-skip-4)[
+    block(width: 100%, above: word-space-skip-3, below: word-space-skip-3)[
       #set align(left)
-      #set par(leading: word-single-leading, justify: false, first-line-indent: 0pt)
+      #set par(leading: word-single-leading, spacing: word-single-leading, justify: false, first-line-indent: 0pt)
       #align(center)[#it.body]
       #if it.has("caption") and it.caption != none [
-        #v(word-space-skip-2, weak: true)
-        #context {
-          let s = dmin-get-strings(au-dmin-lang.get())
-          text(weight: "regular")[#s.figure #it.counter.display(). #it.caption.body]
-        }
+        #block(width: 100%, above: word-space-skip-1, below: 0pt)[
+          #context {
+            let s = dmin-get-strings(au-dmin-lang.get())
+            text(weight: "regular")[#s.figure #it.counter.display(). #it.caption.body]
+          }
+        ]
       ]
+      #consecutive-subhead.update(false)
     ]
   }
 
   // ============================================================================
-  // TABLE OF CONTENTS & LIST ENTRIES — Exhibits E & F (p. 38-40)
+  // TABLE OF CONTENTS & LIST ENTRIES — Exhibits E & F (p. 35-37) & Ch. 3 (p. 13)
   // ============================================================================
   show outline.entry: it => {
     set text(size: 12pt)
@@ -365,85 +401,98 @@
     let is-roman = format != none and (format == "i" or format == "I")
     let p = if format != none { numbering(format, ..p-num) } else { str(p-num.first()) }
     let fill-dots = box(width: 1fr, repeat[ . ])
-    let p-box = box(width: 0.35in, align(right)[#link(loc)[#p]])
+    let p-box = box(width: 0.22in, align(right)[#link(loc)[#p]])
 
     if it.element.func() == figure and it.element.kind == table {
-      // List of Tables entry per Exhibit F (p. 40)
-      v(word-space-skip-3, weak: true)
+      // List of Tables entry per Exhibit F (p. 37) & p. 13 Rule 7 (double space between captions)
       let cap = it.element.caption.body
       context {
+        let first = is-first-table-entry.get()
+        if first { is-first-table-entry.update(false) }
+        let abv = if first { 0pt } else { word-space-skip-1 }
         let num = it.element.counter.at(loc).first()
-        grid(
-          columns: (0.35in, 1fr),
-          align: (top + left, top + left),
-          [#num.],
-          [
-            #set par(
-              leading: word-single-leading,
-              first-line-indent: 0pt,
-              justify: false,
-            )
-            #show linebreak: it => [#it#h(0.30in)]
-            #link(loc)[#cap]#fill-dots#h(word-space-skip-2)#p-box
-          ],
-        )
+        block(width: 100%, above: abv, below: 0pt)[
+          #grid(
+            columns: (0.35in, 1fr),
+            align: (top + left, top + left),
+            [#num.],
+            [
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                first-line-indent: 0pt,
+                justify: false,
+              )
+              #show linebreak: it => [#it#h(0.30in)]
+              #link(loc)[#cap]#fill-dots#h(3pt)#p-box
+            ],
+          )
+        ]
       }
     } else if it.element.func() == figure and it.element.kind == image {
-      // List of Illustrations entry per Exhibit F (p. 40)
-      v(word-space-skip-3, weak: true)
+      // List of Illustrations entry per Exhibit F (p. 37) & p. 13 Rule 7 (double space between captions)
       let cap = it.element.caption.body
       context {
+        let first = is-first-fig-entry.get()
+        if first { is-first-fig-entry.update(false) }
+        let abv = if first { 0pt } else { word-space-skip-1 }
         let num = it.element.counter.at(loc).first()
-        grid(
-          columns: (0.35in, 1fr),
-          align: (top + left, top + left),
-          [#num.],
-          [
-            #set par(
-              leading: word-single-leading,
-              first-line-indent: 0pt,
-              justify: false,
-            )
-            #show linebreak: it => [#it#h(0.30in)]
-            #link(loc)[#cap]#fill-dots#h(word-space-skip-2)#p-box
-          ],
-        )
+        block(width: 100%, above: abv, below: 0pt)[
+          #grid(
+            columns: (0.35in, 1fr),
+            align: (top + left, top + left),
+            [#num.],
+            [
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                first-line-indent: 0pt,
+                justify: false,
+              )
+              #show linebreak: it => [#it#h(0.30in)]
+              #link(loc)[#cap]#fill-dots#h(3pt)#p-box
+            ],
+          )
+        ]
       }
     } else if it.element.func() == heading {
       if it.level == 1 {
         is-first-subhead.update(true)
         if is-roman {
-          // Preliminary pages in TOC (e.g. LIST OF TABLES, ACKNOWLEDGMENTS) — Flush left
-          v(word-space-skip-2, weak: true)
-          block(above: word-space-skip-2, below: 0pt)[
-            #set par(
-              leading: word-single-leading,
-              first-line-indent: 0pt,
-              justify: false,
-            )
-            #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
-          ]
+          // Preliminary pages in TOC (e.g. LIST OF TABLES, ACKNOWLEDGMENTS) — Flush left, double-spaced
+          context {
+            let first-toc = is-first-toc-entry.get()
+            if first-toc { is-first-toc-entry.update(false) }
+            let abv = if first-toc { 0pt } else { word-space-skip-1 }
+            block(width: 100%, above: abv, below: 0pt)[
+              #set par(
+                leading: word-single-leading,
+                spacing: word-single-leading,
+                first-line-indent: 0pt,
+                justify: false,
+              )
+              #link(loc)[#upper(it.element.body)]#fill-dots#h(3pt)#p-box
+            ]
+          }
         } else if (
           it.element.has("supplement")
             and (it.element.supplement == [Appendix] or it.element.supplement == [Appendix-cover])
         ) {
-          // Appendix entry per Exhibit E (p. 38-39)
+          // Appendix entry per Exhibit E (p. 35) — no blank line between "Appendix" and first appendix
           context {
             let s = dmin-get-strings(au-dmin-lang.get())
             let was-seen = seen-appendix.get()
             if not was-seen {
               seen-appendix.update(true)
-              v(word-space-skip-2, weak: true)
-              block(width: 100%, above: word-space-skip-1, below: 6pt)[
-                #set par(first-line-indent: 0pt, leading: word-single-leading)
+              block(width: 100%, above: word-space-skip-1, below: word-single-leading)[
+                #set par(first-line-indent: 0pt, leading: word-single-leading, spacing: word-single-leading)
                 #s.appendix_word
               ]
-            } else {
-              v(word-space-skip-2, weak: true)
             }
             let a-num = appendix-counter.at(loc)
             let letter = numbering("A.", ..a-num)
-            block(above: 2pt, below: 0pt)[
+            let abv = if not was-seen { word-single-leading } else { word-space-skip-1 }
+            block(width: 100%, above: abv, below: 0pt)[
               #pad(left: 0.3in)[
                 #grid(
                   columns: (0.3in, 1fr),
@@ -452,44 +501,43 @@
                   [
                     #set par(
                       leading: word-single-leading,
+                      spacing: word-single-leading,
                       first-line-indent: 0pt,
                       justify: false,
                     )
-                    #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+                    #link(loc)[#upper(it.element.body)]#fill-dots#h(3pt)#p-box
                   ],
                 )
               ]
             ]
           }
         } else if it.element.numbering == none {
-          // Unnumbered level 1 headings (REFERENCE LIST, VITA, etc.) — Flush left
-          v(word-space-skip-2, weak: true)
-          block(above: word-space-skip-2, below: 0pt)[
+          // Unnumbered level 1 headings (REFERENCE LIST, VITA, etc.) — Flush left, double-spaced
+          block(width: 100%, above: word-space-skip-1, below: 0pt)[
             #set par(
               leading: word-single-leading,
+              spacing: word-single-leading,
               first-line-indent: 0pt,
               justify: false,
             )
-            #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+            #link(loc)[#upper(it.element.body)]#fill-dots#h(3pt)#p-box
           ]
         } else {
-          // Chapter entry per Exhibit E (p. 38-39)
+          // Chapter entry per Exhibit E (p. 35) — no blank line between "Chapter" and "1. ..."
           context {
             let s = dmin-get-strings(au-dmin-lang.get())
             let was-seen = seen-chapter.get()
             if not was-seen {
               seen-chapter.update(true)
-              v(word-space-skip-2, weak: true)
-              block(width: 100%, above: word-space-skip-1, below: 6pt)[
-                #set par(first-line-indent: 0pt, leading: word-single-leading)
+              block(width: 100%, above: word-space-skip-1, below: word-single-leading)[
+                #set par(first-line-indent: 0pt, leading: word-single-leading, spacing: word-single-leading)
                 #s.chapter_word
               ]
-            } else {
-              v(word-space-skip-1, weak: true)
             }
             let c-num = counter(heading).at(loc)
             let num = numbering(it.element.numbering, ..c-num)
-            block(above: 2pt, below: 0pt)[
+            let abv = if not was-seen { word-single-leading } else { word-space-skip-1 }
+            block(width: 100%, above: abv, below: 0pt)[
               #pad(left: 0.3in)[
                 #grid(
                   columns: (0.3in, 1fr),
@@ -498,10 +546,11 @@
                   [
                     #set par(
                       leading: word-single-leading,
+                      spacing: word-single-leading,
                       first-line-indent: 0pt,
                       justify: false,
                     )
-                    #link(loc)[#upper(it.element.body)]#fill-dots#h(word-space-skip-1)#p-box
+                    #link(loc)[#upper(it.element.body)]#fill-dots#h(3pt)#p-box
                   ],
                 )
               ]
@@ -509,14 +558,12 @@
           }
         }
       } else {
-        // AU DMin Manual (p. 7, 9): TOC must reflect only the first 3 levels of subheadings (Typst levels 2, 3, 4).
-        // 4th and 5th levels of subheadings (Typst level > 4) are excluded.
+        // AU DMin Manual (p. 6, 9): TOC reflects first 3 levels of subheadings (Typst levels 2, 3, 4).
         if it.level > 4 {
           return none
         }
 
-        // Subheadings (levels 2, 3, 4) — Single-spaced per Exhibit E (p. 38-39)
-        // With hanging indent on runover lines and manual line breaks (\).
+        // Subheadings (levels 2, 3, 4) — Double space after Chapter Title, Single-spaced between subheads (p. 13 & Exhibit E)
         let indent = if it.level == 2 {
           0.9in
         } else if it.level == 3 {
@@ -529,17 +576,18 @@
           let first = is-first-subhead.get()
           if first {
             is-first-subhead.update(false)
-            v(word-space-skip-2, weak: true)
           }
-          block(above: 6pt, below: 6pt)[
+          let abv = if first { word-space-skip-1 } else { word-single-leading }
+          block(width: 100%, above: abv, below: 0pt)[
             #pad(left: indent)[
               #set par(
                 leading: word-single-leading,
+                spacing: word-single-leading,
                 first-line-indent: 0pt,
                 justify: false,
               )
               #show linebreak: it => [#it#h(0.30in)]
-              #link(loc)[#it.element.body]#fill-dots#h(word-space-skip-1)#p-box
+              #link(loc)[#it.element.body]#fill-dots#h(3pt)#p-box
             ]
           ]
         }

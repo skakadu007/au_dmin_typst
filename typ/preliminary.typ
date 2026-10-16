@@ -6,8 +6,8 @@
 #import "state.typ": *
 #import "i18n.typ": *
 #import "layout.typ": (
-  count-title-lines, format-title, word-double-leading, word-single-leading, word-space-skip-1, word-space-skip-2,
-  word-space-skip-3,
+  count-title-lines, format-title, get-title-leading, word-double-leading, word-single-leading, word-space-skip-1,
+  word-space-skip-2, word-space-skip-3,
 )
 
 /// Blank Flyleaf Page (First and Last page of bound dissertation)
@@ -17,6 +17,8 @@
 }
 
 /// Exhibit A: Abstract Title Page
+/// Inch indicators in Exhibit A (3", 4", 6", 7") are measured from the top edge of the paper.
+/// Since top page margin is 1.0in, dy values are (target_inch - 1.0in).
 #let abstract-title-page(
   title: auto,
   author: auto,
@@ -33,11 +35,10 @@
     let disp-author = if author != auto { author } else { meta.author }
     let disp-adviser = if adviser != auto { adviser } else { meta.advisor }
 
-    let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
-    let title-leading = if num-lines >= 3 { word-single-leading } else { word-double-leading }
     let formatted-title = format-title(raw-title, to-upper: true)
+    let title-leading = get-title-leading(formatted-title, title-lines, width: 5.5in)
 
-    // [3" from top edge] = dy: 2.0in (1.0in margin + 2.0in)
+    // [3" from top edge] = dy: 2.0in (1.0in top margin + 2.0in)
     place(top + left, dy: 2.0in)[
       #block(width: 100%)[
         #set align(center)
@@ -46,35 +47,35 @@
       ]
     ]
 
-    // [4" from top edge] = dy: 3.0in (1.0in margin + 3.0in)
+    // [4" from top edge] = dy: 3.0in (1.0in top margin + 3.0in)
     place(top + left, dy: 3.0in)[
       #block(width: 100%)[
         #set align(center)
         #block(width: 5.5in)[
-          #set par(leading: title-leading, first-line-indent: 0pt, justify: false)
+          #set par(leading: title-leading, spacing: title-leading, first-line-indent: 0pt, justify: false)
           #set text(size: 12pt)
           #formatted-title
         ]
       ]
     ]
 
-    // [6" from top edge] = dy: 5.0in (1.0in margin + 5.0in)
+    // [6" from top edge] = dy: 5.0in (1.0in top margin + 5.0in)
     place(top + left, dy: 5.0in)[
       #block(width: 100%)[
         #set align(center)
-        #set par(leading: word-double-leading, first-line-indent: 0pt)
-        #text(size: 12pt)[
-          #if s.by != "" [#s.by \ ]
-          #v(6pt)
-          #disp-author
+        #set text(size: 12pt)
+        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #if s.by != "" [
+          #block(above: 0pt, below: word-double-leading)[#s.by]
         ]
+        #block(above: 0pt, below: 0pt)[#disp-author]
       ]
     ]
 
-    // [7" from top edge] = dy: 6.0in (1.0in margin + 6.0in)
+    // [7" from top edge] = dy: 6.0in (1.0in top margin + 6.0in) — Flush left per Exhibit A
     place(top + left, dy: 6.0in)[
       #block(width: 100%)[
-        #set align(center)
+        #set align(left)
         #set par(leading: word-single-leading, first-line-indent: 0pt)
         #text(size: 12pt)[#s.adviser #disp-adviser]
       ]
@@ -84,6 +85,8 @@
 }
 
 /// Exhibit B: Abstract Body
+/// Header starts at 2" from top edge (1.0in margin + 1.0in v).
+/// "Title:" starts at exactly 4" from top edge (after a 2.0in header container).
 #let abstract-body(
   title: auto,
   author: auto,
@@ -113,16 +116,19 @@
 
     let formatted-title = format-title(raw-title, to-upper: true)
 
-    v(1.0in) // 2" from top edge
-    align(center)[
-      #set par(leading: word-single-leading, first-line-indent: 0pt)
-      #block(below: word-space-skip-1)[#s.abstract_header]
-      #block(below: word-space-skip-2)[#s.dissertation_type]
-      #block(below: word-space-skip-1)[#disp-univ]
-      #block(below: word-space-skip-2)[#disp-school]
+    v(1.0in) // 2.0" from top edge of paper
+    block(width: 100%, height: 2.0in, above: 0pt, below: 0pt)[
+      #align(center)[
+        #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt)
+        #block(above: 0pt, below: word-space-skip-1)[#s.abstract_header]
+        #block(above: word-space-skip-1, below: word-space-skip-2)[#s.dissertation_type]
+        #block(above: word-space-skip-2, below: word-space-skip-1)[#disp-univ]
+        #block(above: word-space-skip-1, below: 0pt)[#disp-school]
+      ]
     ]
-    block(below: word-space-skip-2)[
-      #set par(leading: word-single-leading, first-line-indent: 0pt, justify: false)
+    // Starts at exactly 4.0" from top edge of paper (1.0in margin + 1.0in v + 2.0in block)
+    block(width: 100%, above: 0pt, below: word-space-skip-2)[
+      #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt, justify: false)
       #grid(
         columns: 100%,
         row-gutter: word-space-skip-1,
@@ -145,22 +151,22 @@
     )
 
     block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
-      #align(center)[#text(size: 12pt, weight: "bold")[#s.problem]]
+      #align(center)[#text(size: 12pt, weight: "regular")[#s.problem]]
     ]
     problem
 
     block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
-      #align(center)[#text(size: 12pt, weight: "bold")[#s.method]]
+      #align(center)[#text(size: 12pt, weight: "regular")[#s.method]]
     ]
     method
 
     block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
-      #align(center)[#text(size: 12pt, weight: "bold")[#s.results]]
+      #align(center)[#text(size: 12pt, weight: "regular")[#s.results]]
     ]
     results
 
     block(width: 100%, above: word-space-skip-2, below: word-space-skip-1, sticky: true)[
-      #align(center)[#text(size: 12pt, weight: "bold")[#s.conclusions]]
+      #align(center)[#text(size: 12pt, weight: "regular")[#s.conclusions]]
     ]
     conclusions
   }
@@ -216,8 +222,7 @@
   }
 
   let formatted-title = format-title(raw-title, to-upper: true)
-  let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
-  let title-leading = if num-lines >= 3 { word-single-leading } else { word-double-leading }
+  let title-leading = get-title-leading(formatted-title, title-lines, width: 5.5in)
 
   set page(footer: none)
 
@@ -225,8 +230,10 @@
   place(top + left, dy: 1.5in)[
     #block(width: 100%)[
       #set align(center)
+      #set text(size: 12pt)
       #set par(leading: word-single-leading, first-line-indent: 0pt)
-      #text(size: 12pt)[#disp-univ\ \ #disp-school]
+      #block(above: 0pt, below: word-double-leading)[#disp-univ]
+      #block(above: 0pt, below: 0pt)[#disp-school]
     ]
   ]
 
@@ -235,7 +242,7 @@
     #block(width: 100%)[
       #set align(center)
       #block(width: 5.5in)[
-        #set par(leading: title-leading, first-line-indent: 0pt, justify: false)
+        #set par(leading: title-leading, spacing: title-leading, first-line-indent: 0pt, justify: false)
         #set text(size: 12pt)
         #formatted-title
       ]
@@ -246,13 +253,12 @@
   place(top + left, dy: 5.0in)[
     #block(width: 100%)[
       #set align(center)
-      #set par(leading: word-double-leading, first-line-indent: 0pt)
-      #text(size: 12pt)[
-        #disp-pres-1\
-        #disp-pres-2\
-        #disp-pres-3\
-        #disp-degree
-      ]
+      #set text(size: 12pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #block(above: 0pt, below: word-double-leading)[#disp-pres-1]
+      #block(above: 0pt, below: word-double-leading)[#disp-pres-2]
+      #block(above: 0pt, below: word-double-leading)[#disp-pres-3]
+      #block(above: 0pt, below: 0pt)[#disp-degree]
     ]
   ]
 
@@ -260,12 +266,13 @@
   place(top + left, dy: 7.5in)[
     #block(width: 100%)[
       #set align(center)
-      #set par(leading: word-double-leading, first-line-indent: 0pt)
-      #text(size: 12pt)[
-        #if s.by != "" [#s.by \ ]
-        #disp-author\
-        #disp-date
+      #set text(size: 12pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #if s.by != "" [
+        #block(above: 0pt, below: word-double-leading)[#s.by]
       ]
+      #block(above: 0pt, below: word-double-leading)[#disp-author]
+      #block(above: 0pt, below: 0pt)[#disp-date]
     ]
   ]
 
@@ -293,22 +300,24 @@
   set page(footer: none, header: none)
   v(3.5in)
   align(center)[
-    #set par(leading: word-single-leading, first-line-indent: 0pt)
+    #set par(leading: word-double-leading, spacing: word-double-leading, first-line-indent: 0pt)
     #set text(size: 12pt)
     #if content != auto [
       #content
     ] else [
-      © Copyright by #disp-author #disp-year \
-      #if au-dmin-lang.get() == "uk" [
-        Всі права захищено
-      ] else if au-dmin-lang.get() == "ru" [
-        Все права защищены
-      ] else if au-dmin-lang.get() == "fr" [
-        Tous droits réservés
-      ] else if au-dmin-lang.get() == "es" [
-        Todos los derechos reservados
-      ] else [
-        All Rights Reserved
+      #block(above: 0pt, below: word-double-leading)[© Copyright by #disp-author #disp-year]
+      #block(above: 0pt, below: 0pt)[
+        #if au-dmin-lang.get() == "uk" [
+          Всі права захищено
+        ] else if au-dmin-lang.get() == "ru" [
+          Все права защищены
+        ] else if au-dmin-lang.get() == "fr" [
+          Tous droits réservés
+        ] else if au-dmin-lang.get() == "es" [
+          Todos los derechos reservados
+        ] else [
+          All Rights Reserved
+        ]
       ]
     ]
   ]
@@ -342,8 +351,7 @@
   let disp-date-approved = if date-approved != auto { date-approved } else { meta.date-approved }
 
   let formatted-title = format-title(raw-title, to-upper: true)
-  let num-lines = if title-lines != auto { title-lines } else { count-title-lines(raw-title) }
-  let title-leading = if num-lines >= 3 { word-single-leading } else { word-double-leading }
+  let title-leading = get-title-leading(formatted-title, title-lines, width: 5.5in)
 
   set page(footer: none)
 
@@ -354,6 +362,7 @@
       #block(width: 5.5in)[
         #set par(
           leading: title-leading,
+          spacing: title-leading,
           first-line-indent: 0pt,
         )
         #text(size: 12pt)[#formatted-title]
@@ -366,13 +375,12 @@
     #block(width: 100%)[
       #set align(center)
       #block(width: 5.5in)[
+        #set text(size: 12pt)
         #set par(leading: word-single-leading, first-line-indent: 0pt)
-        #text(size: 12pt)[
-          #s.title_page_pres_1\
-          #s.title_page_pres_2\
-          #s.title_page_pres_3\
-          #disp-degree
-        ]
+        #block(above: 0pt, below: word-single-leading)[#s.title_page_pres_1]
+        #block(above: 0pt, below: word-single-leading)[#s.title_page_pres_2]
+        #block(above: 0pt, below: word-single-leading)[#s.title_page_pres_3]
+        #block(above: 0pt, below: 0pt)[#disp-degree]
       ]
     ]
   ]
@@ -381,11 +389,12 @@
   place(top + left, dy: 4.0in)[
     #block(width: 100%)[
       #set align(center)
-      #set par(leading: word-double-leading, first-line-indent: 0pt)
-      #text(size: 12pt)[
-        #if s.by != "" [#s.by \ ]
-        #disp-author
+      #set text(size: 12pt)
+      #set par(leading: word-single-leading, first-line-indent: 0pt)
+      #if s.by != "" [
+        #block(above: 0pt, below: word-double-leading)[#s.by]
       ]
+      #block(above: 0pt, below: 0pt)[#disp-author]
     ]
   ]
 
@@ -394,11 +403,11 @@
     #block(width: 100%)[
       #set align(left)
       #set text(size: 12pt)
-      #set par(leading: word-single-leading, first-line-indent: 0pt)
-      #block(below: word-space-skip-1)[#s.approval_by]
+      #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt)
+      #block(above: 0pt, below: word-space-skip-2)[#s.approval_by]
 
       #let sig-block(body) = stack(
-        spacing: word-single-leading,
+        spacing: 4pt,
         line(length: 2.7in),
         body,
       )
@@ -406,26 +415,26 @@
       #grid(
         columns: (1fr, 1fr),
         column-gutter: 0.5in,
-        row-gutter: word-space-skip-3,
+        row-gutter: word-space-skip-2,
         sig-block[
-          #s.committee_adviser\
+          #s.committee_adviser #linebreak()
           #disp-advisor
         ],
         sig-block[
-          #s.committee_director\
+          #s.committee_director #linebreak()
           #disp-director
         ],
 
         sig-block[
           #if disp-second != none [
-            #s.committee_second\
+            #s.committee_second #linebreak()
             #disp-second
           ] else [
             #s.committee_second
           ]
         ],
         sig-block[
-          #s.committee_dean\
+          #s.committee_dean #linebreak()
           #disp-dean
         ],
 
@@ -435,7 +444,7 @@
           sig-block[]
         },
         sig-block[
-          #s.committee_date\
+          #s.committee_date #linebreak()
           #if disp-date-approved != "Month Day, Year" and disp-date-approved != auto [
             #disp-date-approved
           ]
@@ -452,7 +461,7 @@
   #v(2.5in)
   #align(center)[
     #block(width: 4.5in)[
-      #set par(leading: word-double-leading, first-line-indent: 0pt)
+      #set par(leading: word-double-leading, spacing: word-double-leading, first-line-indent: 0pt)
       #emph(content)
     ]
   ]
@@ -460,7 +469,7 @@
 ]
 
 /// Exhibit E: Table of Contents
-/// AU DMin Manual (p. 7 & 9): TOC must reflect only first three levels of subheadings (depth: 4).
+/// AU DMin Manual (p. 6 & 9): TOC must reflect only first three levels of subheadings (depth: 4).
 #let dmin-toc(title: auto, show-page-number: true, depth: 4) = {
   seen-chapter.update(false)
   seen-appendix.update(false)
@@ -470,10 +479,10 @@
   if not show-page-number {
     set page(footer: none)
     v(1.0in)
-    block(width: 100%, below: word-space-skip-2)[
+    block(width: 100%, above: 0pt, below: word-space-skip-2)[
       #align(center)[
         #set text(size: 12pt, weight: "regular")
-        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt)
         #context {
           let s = dmin-get-strings(au-dmin-lang.get())
           if title == auto { s.toc } else { upper(title) }
@@ -504,10 +513,10 @@
       },
     )
     v(1.0in)
-    block(width: 100%, below: word-space-skip-2)[
+    block(width: 100%, above: 0pt, below: word-space-skip-2)[
       #align(center)[
         #set text(size: 12pt, weight: "regular")
-        #set par(leading: word-single-leading, first-line-indent: 0pt)
+        #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt)
         #context {
           let s = dmin-get-strings(au-dmin-lang.get())
           if title == auto { s.toc } else { upper(title) }
@@ -563,7 +572,7 @@
     }
   ]
   align(left)[
-    #set par(leading: word-single-leading, first-line-indent: 0pt)
+    #set par(leading: word-single-leading, spacing: word-single-leading, first-line-indent: 0pt)
     #grid(
       columns: (1.2in, 1fr),
       row-gutter: word-space-skip-1,
@@ -594,7 +603,7 @@
   body
 }
 
-/// Vita Page — Chapter 2 (p. 5/11)
+/// Vita Page — Chapter 2 (p. 4, 11)
 #let vita-page(title: auto, author: auto, content) = {
   heading(level: 1, numbering: none, outlined: true)[
     #context {
