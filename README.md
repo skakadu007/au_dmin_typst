@@ -560,25 +560,26 @@ You can cite sources using standard `@key` syntax or using the `#cite(...)` func
 | Citation Type | Typst Syntax | Result in Text | Description / Use Case |
 |---|---|---|---|
 | **Parenthetical** | `@smith2018` | `(Smith 2018)` | Standard parenthetical reference |
-| **With Page Number** | `@smith2018[p. 45]` | `(Smith 2018, 45)` | Specific page reference |
-| **With Page Range** | `@smith2018[pp. 45-48]` | `(Smith 2018, 45–48)` | Multi-page range |
+| **With Page Number (Standard)** | `@smith2018[45]` | `(Smith 2018, 45)` | Bare page number per Turabian 9th / AU DMin |
+| **With Page Prefix** | `@smith2018[p. 45]` or `@smith2018[с. 45]` | `(Smith 2018, 45)` | Prefixes "p.", "pp.", "с.", "(с.)" auto-stripped |
+| **With Page Range** | `@smith2018[45-48]` | `(Smith 2018, 45–48)` | Multi-page range |
 | **With Volume & Page** | `@calvin1960[20:45]` | `(Calvin 1960, 20:45)` | Multi-volume works |
 | **Year Only** (author in text) | `#cite(<smith2018>, form: "year")` | `2018` | When author is named in the sentence |
 | **Author Only** | `#cite(<smith2018>, form: "author")` | `Smith` | Prints author's surname only |
 | **Narrative / Prose** | `#cite(<smith2018>, form: "prose")` | `Smith (2018)` | Author in text, year in parentheses |
 | **Narrative with Page** | `#cite(<smith2018>, form: "prose", supplement: [45])` | `Smith (2018, 45)` | Ideal for sentence leads |
-| **Multiple Sources** | `#cite(<smith2018>, <craigie1983>)` | `(Smith 2018; Craigie 1983)` | Semicolon-separated references |
-| **With Prefix** (*see*, *cf.*) | `#cite(<smith2018>, prefix: [see ], supplement: [p. 12])` | `(see Smith 2018, 12)` | Introductory words |
-| **In Blockquote** | `#blockquote[Text... @gilkey1989[p. 11]]` | `... (Gilkey 1989, 11)` | Blockquote attribution |
+| **Multiple Sources** | `@smith2018 @craigie1983` | `(Craigie 1983; Smith 2018)` | Automatically alphabetical by author surname |
+| **With Prefix** (*see*, *cf.*) | `#cite(<smith2018>, prefix: [see ], supplement: [12])` | `(see Smith 2018, 12)` | Introductory words |
+| **In Blockquote** | `#blockquote[Text... @gilkey1989[11]]` | `... (Gilkey 1989, 11)` | Blockquote attribution |
 
 > **💡 Example using `form: "year"` and `form: "prose"` in text**:
 > ```typst
 > // Option 1: Author named in sentence, year in parentheses
-> As Craigie (#cite(<craigie1983>, form: "year", supplement: [p. 15])) argues, Ugaritic texts...
+> As Craigie (#cite(<craigie1983>, form: "year", supplement: [15])) argues, Ugaritic texts...
 > // Result: As Craigie (1983, 15) argues, Ugaritic texts...
 > 
 > // Option 2: Prose form
-> The study by #cite(<gordiienko_2019>, form: "prose", supplement: [p. 40]) demonstrates urban trends...
+> The study by #cite(<gordiienko_2019>, form: "prose", supplement: [40]) demonstrates urban trends...
 > // Result: The study by Gordiienko (2019, 40) demonstrates urban trends...
 > ```
 

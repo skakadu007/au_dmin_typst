@@ -6,7 +6,7 @@
 // ==============================================================================
 
 #show: au-dmin.with(
-  title: "THE USE OF SCIENCE IN THEOLOGY:\ INTRODUCTION \ AND HISTORICAL BACKGROUND",
+  title: "THE USE OF SCIENCE IN THEOLOGY:\ INTRODUCTION AND HISTORICAL BACKGROUND",
   author: "Taras Shevchenko",
   degree: "Doctor of Ministry",
   advisor: "John A. Smith, Ph.D.",
@@ -135,7 +135,7 @@ Science and religion are arguably the two most powerful forces in human culture.
 For Langdon Gilkey, science and theology are "mutually interdependent" with regard to relations between their types of truth:
 
 #blockquote[
-  For both science and religion . . . the question of the relation of each to reality, of the truth each holds, is crucial---for both essentially represent a relation to reality that is cognitive or believed to be so. And thus, because science and religion are mutually interdependent, the issues of the truth of science and the truth of religion and of the relations between these sorts of truth represent fundamental concerns for each. @gilkey1989[p. 11]
+  For both science and religion . . . the question of the relation of each to reality, of the truth each holds, is crucial---for both essentially represent a relation to reality that is cognitive or believed to be so. And thus, because science and religion are mutually interdependent, the issues of the truth of science and the truth of religion and of the relations between these sorts of truth represent fundamental concerns for each. @gilkey1989[11]
 ]
 
 Now that Gilkey's view of science has been surveyed, the nature of his model for theology and, therefore, for the use of empirical inquiry must be carefully delineated @canale2005.
@@ -143,7 +143,7 @@ Now that Gilkey's view of science has been surveyed, the nature of his model for
 // Level 3 subhead (left margin, bold, title case) — per Exhibit I: "The Nature of Theology"
 #heading(level: 4)[The Nature of Theology]
 
-Seventh-day Adventist theology has maintained a dynamic posture toward scientific developments while upholding the authority of Scripture @andrews2024. In the historical evolution of Adventist higher education, tensions and synthesis were frequently observed @gc1995[p. 112].
+Seventh-day Adventist theology has maintained a dynamic posture toward scientific developments while upholding the authority of Scripture @andrews2024. In the historical evolution of Adventist higher education, tensions and synthesis were frequently observed @gc1995[112].
 
 // Level 4 subhead (left margin, not bold, sentence case)
 #heading(level: 5)[Curricular innovations in ministerial training]
